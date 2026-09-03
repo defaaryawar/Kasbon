@@ -82,14 +82,44 @@ export type DebtFormValues = z.infer<typeof debtFormSchema>;
 
 export const uuidParamSchema = z.string().uuid("ID transaksi tidak valid");
 
-export const authFormSchema = z.object({
+// Strict Sign Up Schema: Name required, Email required, Phone optional, Password strong
+export const signUpFormSchema = z.object({
   fullName: z
     .string()
     .trim()
-    .max(100, "Nama lengkap maksimal 100 karakter")
+    .min(2, "Nama lengkap wajib diisi (minimal 2 karakter)")
+    .max(100, "Nama lengkap maksimal 100 karakter"),
+  phoneNumber: z
+    .string()
+    .trim()
+    .regex(/^[0-9]*$/, "Nomor HP hanya boleh berisi angka")
+    .max(20, "Nomor HP maksimal 20 karakter")
     .optional(),
-  email: z.string().trim().toLowerCase().email("Format email tidak valid"),
-  password: z.string().min(6, "Password minimal 6 karakter"),
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email wajib diisi")
+    .toLowerCase()
+    .email("Format email tidak valid"),
+  password: z
+    .string()
+    .min(8, "Password minimal 8 karakter")
+    .regex(/[A-Z]/, "Password harus mengandung minimal 1 huruf besar (A-Z)")
+    .regex(/[0-9]/, "Password harus mengandung minimal 1 angka (0-9)")
+    .regex(/[^a-zA-Z0-9]/, "Password harus mengandung minimal 1 simbol (!@#$%^&*)"),
 });
 
-export type AuthFormValues = z.infer<typeof authFormSchema>;
+export type SignUpFormValues = z.infer<typeof signUpFormSchema>;
+
+// Login Schema
+export const loginFormSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email wajib diisi")
+    .toLowerCase()
+    .email("Format email tidak valid"),
+  password: z.string().min(1, "Password wajib diisi"),
+});
+
+export type LoginFormValues = z.infer<typeof loginFormSchema>;
