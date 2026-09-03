@@ -6,7 +6,7 @@ Kasbon adalah web application berbasis Next.js 16 (App Router) untuk mencatat da
 
 ## Link Demo & Repository
 
-- Live Demo Vercel: [https://kasbon.vercel.app](https://kasbon.vercel.app)
+- Live Demo Vercel: [https://kasbon-red.vercel.app](https://kasbon-red.vercel.app)
 - Repository GitHub: [https://github.com/defaaryawar/Kasbon](https://github.com/defaaryawar/Kasbon)
 - Portfolio Developer: [https://defanolabs.com](https://defanolabs.com)
 
