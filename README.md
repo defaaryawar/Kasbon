@@ -15,12 +15,14 @@ Kasbon adalah web application berbasis Next.js 16 (App Router) untuk mencatat da
 ## Tech Stack & Library Dependensi
 
 ### Core Stack (Wajib)
+
 - Next.js 16 (App Router) & TypeScript Strict
 - Tailwind CSS v4
 - Supabase (PostgreSQL + Auth + Row Level Security)
 - Lucide React (Ikon UI Murni)
 
 ### Dependensi Tambahan & Alasan Penggunaan
+
 1. **zod**: Schema validation type-safe untuk memastikan validitas data input di client dan API Server. Digunakan untuk memvalidasi syarat password kuat (min. 8 karakter, 1 huruf besar, 1 angka, 1 simbol), format email, sanitasi XSS, serta validasi UUID parameter untuk mencegah manipulasi input dari frontend.
 2. **framer-motion**: Menyediakan micro-interaction yang sangat halus pada transisi layar (termasuk transisi mulus pada layar Pendaftaran Berhasil, animasi collapsible sidebar, serta modal konfirmasi hapus).
 3. **sonner**: Library notifikasi toast modern yang dikonfigurasi di posisi Pojok Atas Kanan (top-right) lengkap dengan ikon Lucide murni & tombol close x interaktif.
@@ -129,6 +131,7 @@ kasbon/
 ## Setup & Panduan Menjalankan Lokal
 
 ### 1. Environment Variables (.env.local)
+
 Buat file .env.local di root project dan masukkan kredensial Supabase:
 
 ```env
@@ -137,16 +140,20 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 ### 2. Migrasi Database (Supabase)
+
 Eksekusi file SQL migration dari `supabase/migrations/20260903000000_create_debts_table.sql` di SQL Editor Supabase:
+
 - Tabel `debts` dengan kolom `amount` ber-tipe `bigint` untuk nominal Rupiah utuh.
 - Performance indexing pada `(user_id, status, type)`.
 - Kebijakan Row Level Security (RLS) strict (`auth.uid() = user_id`) untuk mengisolasi data antar pengguna.
 
 ### 3. Menjalankan Server Lokal
+
 ```bash
 npm install
 npm run dev
 ```
+
 Buka browser di `http://localhost:3000`.
 
 ---
@@ -154,12 +161,15 @@ Buka browser di `http://localhost:3000`.
 ## Jawaban Pertanyaan Hiring Brief (Approach, Trade-off, & Time Spent)
 
 ### 1. Technical Approach (Keputusan Teknis yang Dibanggakan)
+
 > "Saya sangat bangga menerapkan kombinasi Clean Architecture dan Event-Driven Architecture (EDA) di Next.js App Router. Penggunaan Domain EventBus terdekopel memisahkan operasi database Supabase dengan pengolahan event log, sementara validasi Zod ketat di client & server API memastikan Zero-Trust Security (mencegah XSS & manipulasi input). Ditambah visualisasi Semi-Circle Gauge Arc Chart dan transisi UI mulus yang membuat UX aplikasi terasa sangat premium."
 
 ### 2. Trade-off (Rencana Pengembangan Fitur Lanjutan)
+
 > "Jika aplikasi ini dikembangkan lebih lanjut (1 hari tambahan), fitur yang dapat diimplementasikan meliputi Ekspor Laporan Transaksi ke format PDF/CSV, integrasi Pengingat Jatuh Tempo otomatis via WhatsApp API (Twilio/WATI), serta fitur Dark Mode Toggle menggunakan CSS variables."
 
 ### 3. Time Spent (Alokasi Waktu Pengerjaan)
+
 > "Total waktu pengerjaan sekitar 8 - 9 jam secara intensif, mencakup perancangan schema database + RLS, pembuatan arsitektur EventBus & Repositori, pembuatan komponen UI responsif, integrasi Supabase Auth + Brevo SMTP Custom HTML Template, hingga refactoring validasi Zod."
 
 ---
