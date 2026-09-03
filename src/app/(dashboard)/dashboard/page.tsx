@@ -18,6 +18,7 @@ import { CheckCircle2, Trash2, AlertCircle } from "lucide-react";
 export default function DashboardPage() {
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("");
+  const [userPhone, setUserPhone] = useState("");
   const [debts, setDebts] = useState<SerializedDebt[]>([]);
   const [summary, setSummary] = useState({
     totalOwedToMe: "0",
@@ -50,6 +51,8 @@ export default function DashboardPage() {
         if (user.email) setUserEmail(user.email);
         const nameFromMeta = user.user_metadata?.full_name || user.user_metadata?.display_name;
         if (nameFromMeta) setUserName(nameFromMeta);
+        const phoneFromMeta = user.user_metadata?.phone_number || user.user_metadata?.phone || user.phone;
+        if (phoneFromMeta) setUserPhone(phoneFromMeta);
       }
     };
     fetchUser();
@@ -176,6 +179,7 @@ export default function DashboardPage() {
         <Header
           userEmail={userEmail}
           userName={userName}
+          userPhone={userPhone}
           isSidebarCollapsed={isSidebarCollapsed}
           onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />

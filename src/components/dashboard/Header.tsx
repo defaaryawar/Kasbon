@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/infrastructure/supabase/client";
-import { LogOut, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { LogOut, ChevronDown, PanelLeftClose, PanelLeftOpen, Phone } from "lucide-react";
 
 interface HeaderProps {
   userEmail: string;
   userName?: string;
+  userPhone?: string;
   isSidebarCollapsed: boolean;
   onToggleSidebar: () => void;
 }
@@ -15,6 +16,7 @@ interface HeaderProps {
 export function Header({
   userEmail,
   userName,
+  userPhone,
   isSidebarCollapsed,
   onToggleSidebar,
 }: HeaderProps) {
@@ -87,14 +89,20 @@ export function Header({
                 className="fixed inset-0 z-40"
               />
 
-              <div className="absolute right-0 mt-2 w-56 p-2 rounded-2xl bg-white border border-zinc-200 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div className="px-3 py-2 border-b border-zinc-100 mb-1">
+              <div className="absolute right-0 mt-2 w-60 p-2 rounded-2xl bg-white border border-zinc-200 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-3 py-2 border-b border-zinc-100 mb-1 space-y-0.5">
                   <p className="text-xs font-bold text-zinc-900 truncate">
                     {displayName}
                   </p>
-                  <p className="text-[11px] text-zinc-400 font-medium truncate mt-0.5">
+                  <p className="text-[11px] text-zinc-400 font-medium truncate">
                     {userEmail}
                   </p>
+                  {userPhone && (
+                    <div className="flex items-center gap-1 text-[10px] font-semibold text-zinc-500 pt-0.5">
+                      <Phone className="w-3 h-3 text-[#D94E15]" />
+                      <span>{userPhone}</span>
+                    </div>
+                  )}
                 </div>
 
                 <button
