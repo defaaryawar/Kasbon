@@ -16,50 +16,73 @@ export function SummaryCards({
   const oweVal = typeof totalIOwe === "string" ? BigInt(totalIOwe) : totalIOwe;
   const netVal = typeof net === "string" ? BigInt(net) : net;
 
+  const isNetPositive = netVal >= BigInt(0);
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-      {/* Card 1: Total dihutang ke saya */}
-      <div className="p-5 rounded-2xl bg-white dark:bg-[#181818] border border-zinc-200/80 dark:border-zinc-800 shadow-sm">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-4">
+      {/* Card 1: Total Dihutang ke Saya */}
+      <div className="p-4 sm:p-5 rounded-xl bg-white border border-zinc-200/90 shadow-2xs flex flex-col justify-between">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-            Dihutang ke Saya
-          </span>
-          <div className="p-2 rounded-xl bg-[#D94E15]/10 text-[#D94E15]">
-            <ArrowUpRight className="w-4 h-4" />
+          <div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center text-[#D94E15]">
+            <ArrowUpRight className="w-4.5 h-4.5" />
           </div>
+          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#D94E15]/10 text-[#D94E15]">
+            Piutang
+          </span>
         </div>
-        <div className="text-2xl font-extrabold text-zinc-900 dark:text-white">
-          {formatRupiah(owedVal)}
+        <div>
+          <p className="text-xs font-semibold text-zinc-500 mb-0.5">
+            Total Dihutang ke Saya
+          </p>
+          <p className="text-xl sm:text-2xl font-extrabold text-zinc-900 tracking-tight">
+            {formatRupiah(owedVal)}
+          </p>
         </div>
       </div>
 
-      {/* Card 2: Total saya hutang */}
-      <div className="p-5 rounded-2xl bg-white dark:bg-[#181818] border border-zinc-200/80 dark:border-zinc-800 shadow-sm">
+      {/* Card 2: Total Saya Hutang */}
+      <div className="p-4 sm:p-5 rounded-xl bg-white border border-zinc-200/90 shadow-2xs flex flex-col justify-between">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-            Saya Hutang
-          </span>
-          <div className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
-            <ArrowDownLeft className="w-4 h-4" />
+          <div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700">
+            <ArrowDownLeft className="w-4.5 h-4.5" />
           </div>
+          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-zinc-100 text-zinc-600">
+            Utang
+          </span>
         </div>
-        <div className="text-2xl font-extrabold text-zinc-900 dark:text-white">
-          {formatRupiah(oweVal)}
+        <div>
+          <p className="text-xs font-semibold text-zinc-500 mb-0.5">
+            Total Saya Hutang
+          </p>
+          <p className="text-xl sm:text-2xl font-extrabold text-zinc-900 tracking-tight">
+            {formatRupiah(oweVal)}
+          </p>
         </div>
       </div>
 
       {/* Card 3: Saldo Net */}
-      <div className="p-5 rounded-2xl bg-white dark:bg-[#181818] border border-zinc-200/80 dark:border-zinc-800 shadow-sm">
+      <div className="p-4 sm:p-5 rounded-xl bg-white border border-zinc-200/90 shadow-2xs flex flex-col justify-between">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-            Saldo Net
-          </span>
-          <div className="p-2 rounded-xl bg-[#D94E15]/10 text-[#D94E15]">
-            <Scale className="w-4 h-4" />
+          <div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center text-[#D94E15]">
+            <Scale className="w-4.5 h-4.5" />
           </div>
+          <span
+            className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+              isNetPositive
+                ? "bg-[#D94E15]/10 text-[#D94E15]"
+                : "bg-zinc-100 text-zinc-600"
+            }`}
+          >
+            {isNetPositive ? "+Surplus" : "-Defisit"}
+          </span>
         </div>
-        <div className="text-2xl font-extrabold text-[#D94E15]">
-          {formatRupiah(netVal)}
+        <div>
+          <p className="text-xs font-semibold text-zinc-500 mb-0.5">
+            Saldo Net
+          </p>
+          <p className="text-xl sm:text-2xl font-extrabold text-[#D94E15] tracking-tight">
+            {formatRupiah(netVal)}
+          </p>
         </div>
       </div>
     </div>
