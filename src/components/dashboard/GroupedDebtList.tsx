@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { SerializedDebt, DebtItem } from "./DebtItem";
 import { formatRupiah } from "@/lib/utils";
-import { Users, ChevronDown, ChevronUp, User } from "lucide-react";
+import { ChevronDown, ChevronUp, User } from "lucide-react";
 
 interface GroupedDebtListProps {
   debts: SerializedDebt[];
@@ -39,7 +39,7 @@ export function GroupedDebtList({
         {[1, 2].map((i) => (
           <div
             key={i}
-            className="h-28 rounded-2xl bg-zinc-100 dark:bg-zinc-800/50 animate-pulse"
+            className="h-20 rounded-2xl bg-[#181818] animate-pulse"
           />
         ))}
       </div>
@@ -48,21 +48,12 @@ export function GroupedDebtList({
 
   if (debts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl bg-white dark:bg-zinc-900 border border-dashed border-zinc-200 dark:border-zinc-800">
-        <div className="p-4 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mb-3">
-          <Users className="w-8 h-8" />
-        </div>
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-          Tidak ada grup transaksi
-        </h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mt-1">
-          Pencatatan utang piutang akan dikelompokkan secara otomatis berdasarkan nama orang.
-        </p>
+      <div className="p-8 text-center rounded-2xl bg-[#181818] border border-dashed border-zinc-800 text-zinc-400 text-xs">
+        Belum ada catatan transaksi.
       </div>
     );
   }
 
-  // Group debts by counterpartName (case-insensitive key)
   const groupsMap = new Map<string, PersonGroup>();
 
   for (const debt of debts) {
@@ -102,61 +93,47 @@ export function GroupedDebtList({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {groups.map((group) => {
         const isExpanded = expandedNames[group.name] ?? true;
-        const isNetPositive = group.net >= BigInt(0);
 
         return (
           <div
             key={group.name}
-            className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden"
+            className="rounded-2xl border border-zinc-800/80 bg-[#181818] overflow-hidden"
           >
             {/* Group Header */}
             <div
               onClick={() => toggleExpand(group.name)}
-              className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50/70 dark:bg-zinc-800/40 cursor-pointer hover:bg-zinc-100/80 dark:hover:bg-zinc-800/70 transition-colors"
+              className="p-4 flex items-center justify-between gap-3 cursor-pointer hover:bg-zinc-800/40 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                  <User className="w-5 h-5" />
+                <div className="p-2 rounded-xl bg-zinc-800 text-[#D94E15]">
+                  <User className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50">
-                      {group.name}
-                    </h3>
-                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-zinc-200/70 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300">
-                      {group.items.length} transaksi
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                    {group.unsettledCount > 0
-                      ? `${group.unsettledCount} transaksi belum lunas`
-                      : "Semua transaksi lunas 👍"}
+                  <h3 className="text-sm font-bold text-white">
+                    {group.name}
+                  </h3>
+                  <p className="text-xs text-zinc-500">
+                    {group.items.length} transaksi ({group.unsettledCount} belum lunas)
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-200/60 dark:border-zinc-700/60">
+              <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <div className="text-xs text-zinc-400">Saldo Bersih (Net)</div>
-                  <div
-                    className={`text-base font-extrabold ${
-                      isNetPositive
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-rose-600 dark:text-rose-400"
-                    }`}
-                  >
+                  <div className="text-xs text-zinc-500">Net</div>
+                  <div className="text-sm font-extrabold text-[#D94E15]">
                     {formatRupiah(group.net)}
                   </div>
                 </div>
 
-                <div className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+                <div className="text-zinc-500">
                   {isExpanded ? (
-                    <ChevronUp className="w-5 h-5" />
+                    <ChevronUp className="w-4 h-4" />
                   ) : (
-                    <ChevronDown className="w-5 h-5" />
+                    <ChevronDown className="w-4 h-4" />
                   )}
                 </div>
               </div>
@@ -164,7 +141,7 @@ export function GroupedDebtList({
 
             {/* Group Items */}
             {isExpanded && (
-              <div className="p-4 space-y-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="p-4 space-y-3 border-t border-zinc-800/80 bg-[#141414]">
                 {group.items.map((debt) => (
                   <DebtItem
                     key={debt.id}

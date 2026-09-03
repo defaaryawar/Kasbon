@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
 import { DebtBarChart } from "@/components/dashboard/DebtBarChart";
@@ -122,55 +123,58 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans text-zinc-900 dark:text-zinc-100 flex flex-col">
-      <Header userEmail={userEmail} />
+    <div className="min-h-screen bg-[#f4f4f5] font-sans text-zinc-900 flex flex-col md:flex-row">
+      <Sidebar userEmail={userEmail} onOpenCreateModal={handleOpenCreate} />
 
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8">
-        <SummaryCards
-          totalOwedToMe={summary.totalOwedToMe}
-          totalIOwe={summary.totalIOwe}
-          net={summary.net}
-        />
+      <div className="flex-1 flex flex-col min-w-0">
+        <Header userEmail={userEmail} />
 
-        <DebtBarChart
-          totalOwedToMe={summary.totalOwedToMe}
-          totalIOwe={summary.totalIOwe}
-        />
-
-        <DebtFilter
-          statusFilter={statusFilter}
-          typeFilter={typeFilter}
-          searchQuery={searchQuery}
-          sortOption={sortOption}
-          viewMode={viewMode}
-          onStatusChange={setStatusFilter}
-          onTypeChange={setTypeFilter}
-          onSearchChange={setSearchQuery}
-          onSortChange={setSortOption}
-          onViewModeChange={setViewMode}
-          onOpenCreateModal={handleOpenCreate}
-        />
-
-        {viewMode === "list" ? (
-          <DebtList
-            debts={debts}
-            isLoading={isLoading}
-            onSettle={handleSettle}
-            onEdit={handleOpenEdit}
-            onDelete={handleDelete}
-            processingId={processingId}
+        <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 pb-12">
+          <SummaryCards
+            totalOwedToMe={summary.totalOwedToMe}
+            totalIOwe={summary.totalIOwe}
+            net={summary.net}
           />
-        ) : (
-          <GroupedDebtList
-            debts={debts}
-            isLoading={isLoading}
-            onSettle={handleSettle}
-            onEdit={handleOpenEdit}
-            onDelete={handleDelete}
-            processingId={processingId}
+
+          <DebtBarChart
+            totalOwedToMe={summary.totalOwedToMe}
+            totalIOwe={summary.totalIOwe}
           />
-        )}
-      </main>
+
+          <DebtFilter
+            statusFilter={statusFilter}
+            typeFilter={typeFilter}
+            searchQuery={searchQuery}
+            sortOption={sortOption}
+            viewMode={viewMode}
+            onStatusChange={setStatusFilter}
+            onTypeChange={setTypeFilter}
+            onSearchChange={setSearchQuery}
+            onSortChange={setSortOption}
+            onViewModeChange={setViewMode}
+          />
+
+          {viewMode === "list" ? (
+            <DebtList
+              debts={debts}
+              isLoading={isLoading}
+              onSettle={handleSettle}
+              onEdit={handleOpenEdit}
+              onDelete={handleDelete}
+              processingId={processingId}
+            />
+          ) : (
+            <GroupedDebtList
+              debts={debts}
+              isLoading={isLoading}
+              onSettle={handleSettle}
+              onEdit={handleOpenEdit}
+              onDelete={handleDelete}
+              processingId={processingId}
+            />
+          )}
+        </main>
+      </div>
 
       <DebtModal
         isOpen={isModalOpen}

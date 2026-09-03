@@ -1,7 +1,7 @@
 "use client";
 
 import { formatRupiah, formatRelativeDate } from "@/lib/utils";
-import { CheckCircle2, Edit3, Trash2, ArrowUpRight, ArrowDownLeft, Clock } from "lucide-react";
+import { CheckCircle2, Edit3, Trash2, Clock } from "lucide-react";
 
 export interface SerializedDebt {
   id: string;
@@ -38,81 +38,56 @@ export function DebtItem({
     <div
       className={`p-4 rounded-2xl border transition-all ${
         isSettled
-          ? "bg-zinc-50/40 dark:bg-[#121212]/40 border-zinc-200/50 dark:border-zinc-800/50 opacity-75"
-          : "bg-white dark:bg-[#181818] border-zinc-200/80 dark:border-zinc-800/80 shadow-sm hover:border-[#FC5810]/40"
+          ? "bg-zinc-50/60 dark:bg-[#141414] border-zinc-200/60 dark:border-zinc-800/40 opacity-60"
+          : "bg-white dark:bg-[#181818] border-zinc-200/80 dark:border-zinc-800/80 shadow-sm hover:border-[#D94E15]/40"
       }`}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Person & Details */}
-        <div className="flex items-start gap-3">
-          <div
-            className={`p-2.5 rounded-xl shrink-0 border ${
-              isOwedToMe
-                ? "bg-[#FC5810]/10 text-[#FC5810] border-[#FC5810]/20"
-                : "bg-rose-500/10 text-rose-500 border-rose-500/20"
-            }`}
-          >
-            {isOwedToMe ? (
-              <ArrowUpRight className="w-4 h-4" />
-            ) : (
-              <ArrowDownLeft className="w-4 h-4" />
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-white">
+              {debt.counterpartName}
+            </h3>
+
+            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              • {isOwedToMe ? "Dihutang ke saya" : "Saya hutang"}
+            </span>
+
+            {isSettled && (
+              <span className="text-xs text-[#D94E15] font-semibold">
+                (Lunas)
+              </span>
             )}
           </div>
 
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-                {debt.counterpartName}
-              </h3>
-              <span
-                className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                  isOwedToMe
-                    ? "bg-[#FC5810]/10 text-[#FC5810] border border-[#FC5810]/20"
-                    : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                }`}
-              >
-                {isOwedToMe ? "Dihutang ke saya" : "Saya hutang"}
-              </span>
+          {debt.note && (
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+              {debt.note}
+            </p>
+          )}
 
-              <span
-                className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                  isSettled
-                    ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                    : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                }`}
-              >
-                {isSettled ? "Lunas" : "Belum lunas"}
-              </span>
-            </div>
+          <div className="flex items-center gap-3 text-xs text-zinc-400 dark:text-zinc-500 mt-1.5">
+            <span className="flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" />
+              {formatRelativeDate(debt.createdAt)}
+            </span>
 
-            {debt.note && (
-              <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 italic">
-                &ldquo;{debt.note}&rdquo;
-              </p>
+            {debt.dueDate && (
+              <span>Jatuh tempo: {new Date(debt.dueDate).toLocaleDateString("id-ID")}</span>
             )}
-
-            <div className="flex items-center gap-3 text-xs text-zinc-400 dark:text-zinc-500 mt-1.5">
-              <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" />
-                {formatRelativeDate(debt.createdAt)}
-              </span>
-
-              {debt.dueDate && (
-                <span>Jatuh tempo: {new Date(debt.dueDate).toLocaleDateString("id-ID")}</span>
-              )}
-            </div>
           </div>
         </div>
 
-        {/* Amount & Action Buttons */}
-        <div className="flex sm:flex-col items-center sm:items-end justify-between gap-3 border-t sm:border-t-0 pt-3 sm:pt-0 border-zinc-100 dark:border-zinc-800/80">
+        {/* Amount & Actions */}
+        <div className="flex sm:flex-col items-center sm:items-end justify-between gap-2 border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-100 dark:border-zinc-800">
           <div
             className={`text-lg font-extrabold ${
               isSettled
                 ? "line-through text-zinc-400 dark:text-zinc-500"
                 : isOwedToMe
-                ? "text-[#FC5810]"
-                : "text-rose-600 dark:text-rose-400"
+                ? "text-[#D94E15]"
+                : "text-zinc-900 dark:text-zinc-200"
             }`}
           >
             {formatRupiah(BigInt(debt.amount))}
@@ -123,30 +98,29 @@ export function DebtItem({
               <button
                 onClick={() => onSettle(debt.id)}
                 disabled={isProcessing}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors disabled:opacity-50 cursor-pointer"
-                title="Tandai Lunas"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-[#D94E15] bg-[#D94E15]/10 hover:bg-[#D94E15]/20 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Tandai lunas</span>
+                <span>Lunas</span>
               </button>
             )}
 
             <button
               onClick={() => onEdit(debt)}
               disabled={isProcessing}
-              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-              title="Edit Catatan"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+              title="Edit"
             >
-              <Edit3 className="w-4 h-4" />
+              <Edit3 className="w-3.5 h-3.5" />
             </button>
 
             <button
               onClick={() => onDelete(debt.id)}
               disabled={isProcessing}
-              className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition-colors cursor-pointer"
-              title="Hapus Catatan"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+              title="Hapus"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
