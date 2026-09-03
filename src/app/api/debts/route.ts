@@ -33,7 +33,6 @@ export async function GET(request: NextRequest) {
 
     const summary = await repository.getSummary(user.id);
 
-    // Convert BigInt to string for JSON serialization
     const serializedDebts = debts.map((d) => ({
       ...d,
       amount: d.amount.toString(),
@@ -87,7 +86,6 @@ export async function POST(request: NextRequest) {
       dueDate: validatedData.due_date,
     });
 
-    // Publish EDA Domain Event
     await domainEventBus.publish({
       eventId: crypto.randomUUID(),
       eventType: "DEBT_CREATED",

@@ -5,7 +5,63 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)!;
 
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(
+  identifier: string,
+  limit: number,
+  windowMs: number
+): boolean {
+  const now = Date.now();
+  const entry = rateLimitStore.get(identifier);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitStore.set(identifier, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+
+  if (entry.count >= limit) {
+    return true;
+  }
+
+  entry.count += 1;
+  return false;
+}
+
 export const updateSession = async (request: NextRequest) => {
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0] ||
+    request.headers.get("x-real-ip") ||
+    "127.0.0.1";
+
+  const path = request.nextUrl.pathname;
+
+  if (path.startsWith("/login") || path.startsWith("/signup")) {
+    const isLimited = isRateLimited(`auth:${ip}`, 10, 60 * 1000);
+    if (isLimited && request.method === "POST") {
+      return NextResponse.json(
+        {
+          error:
+            "Terlalu banyak mencoba login/daftar. Istirahat dulu 1 menit ya!",
+        },
+        { status: 429 }
+      );
+    }
+  }
+
+  if (path.startsWith("/api/")) {
+    const isLimited = isRateLimited(`api:${ip}`, 60, 60 * 1000);
+    if (isLimited) {
+      return NextResponse.json(
+        {
+          error:
+            "Waduh, pelan-pelan bro! Terlalu banyak klik dalam waktu singkat. Tunggu sebentar ya.",
+        },
+        { status: 429 }
+      );
+    }
+  }
+
   let supabaseResponse = NextResponse.next({
     request: {
       headers: request.headers,
@@ -36,10 +92,9 @@ export const updateSession = async (request: NextRequest) => {
   } = await supabase.auth.getUser();
 
   const isAuthPage =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/signup");
+    path.startsWith("/login") || path.startsWith("/signup");
 
-  if (!user && !isAuthPage && !request.nextUrl.pathname.startsWith("/api")) {
+  if (!user && !isAuthPage && !path.startsWith("/api")) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

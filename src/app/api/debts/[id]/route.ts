@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/infrastructure/supabase/server";
 import { SupabaseDebtRepository } from "@/infrastructure/supabase/repositories/supabase-debt.repository";
-import { debtFormSchema } from "@/lib/validations/debt.schema";
+import { debtFormSchema, uuidParamSchema } from "@/lib/validations/debt.schema";
 import { domainEventBus } from "@/core/events/event-bus";
 
 interface RouteParams {
@@ -11,6 +11,14 @@ interface RouteParams {
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
+
+    const idValidation = uuidParamSchema.safeParse(id);
+    if (!idValidation.success) {
+      return NextResponse.json(
+        { error: "Format ID transaksi tidak valid" },
+        { status: 400 }
+      );
+    }
     const supabase = await createClient();
     const {
       data: { user },
@@ -36,7 +44,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const body = await request.json();
 
-    // Check if this is a "mark settled" action
     if (body.action === "settle" || body.settled === true) {
       const settled = await repository.settle(id, user.id);
 
@@ -60,7 +67,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    // Otherwise, perform regular update
     const parseResult = debtFormSchema.partial().safeParse(body);
     if (!parseResult.success) {
       const firstError = parseResult.error.issues[0]?.message || "Data input tidak valid";
@@ -106,6 +112,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
+
+    const idValidation = uuidParamSchema.safeParse(id);
+    if (!idValidation.success) {
+      return NextResponse.json(
+        { error: "Format ID transaksi tidak valid" },
+        { status: 400 }
+      );
+    }
     const supabase = await createClient();
     const {
       data: { user },
