@@ -1,104 +1,105 @@
 # Kasbon - Aplikasi Track Utang Piutang Pribadi
 
-Kasbon adalah web application berbasis **Next.js 16 (App Router)** untuk mencatat dan memantau transaksi utang piutang pribadi. Aplikasi ini memungkinkan pengguna mencatat pihak terkait, nominal transaksi, memantau saldo bersih (*Net*), serta mengelola status transaksi secara lunas atau belum lunas.
+Kasbon adalah web application berbasis **Next.js 16 (App Router)** untuk mencatat dan memantau transaksi utang piutang pribadi secara realtime, aman, dan simpel. Aplikasi ini memungkinkan pengguna mencatat pihak terkait, nominal transaksi, memantau rasio utang vs piutang via *Gauge Chart*, serta mengelola status transaksi secara lunas atau belum lunas.
 
 ---
 
-## Tech Stack & Dependensi
+## 🔗 Link Demo & Repository
 
-### Core Stack
+- **Live Demo Vercel:** [https://kasbon.vercel.app](https://kasbon.vercel.app)
+- **Repository GitHub:** [https://github.com/defaaryawar/Kasbon](https://github.com/defaaryawar/Kasbon)
+- **Portfolio Developer:** [https://defanolabs.com](https://defanolabs.com)
+
+---
+
+## 🚀 Tech Stack & Library Dependensi
+
+### Core Stack (Wajib)
 - **Next.js 16 (App Router)** & **TypeScript Strict**
 - **Tailwind CSS v4**
 - **Supabase** (PostgreSQL + Auth + Row Level Security)
-- **Lucide React** (Ikon UI)
+- **Lucide React** (Ikon UI Murni)
 
-### Dependensi Tambahan & Justifikasi
-1. **`@supabase/supabase-js` & `@supabase/ssr`**: SDK resmi Supabase untuk Next.js App Router dalam mengelola sesi authentikasi berbasis cookie secara aman di Server Components, Server Actions, Route Handlers, dan Middleware.
-2. **`zod`**: Schema validation type-safe untuk memastikan validitas data input di client dan payload request di API server, dilengkapi sanitasi XSS.
-3. **`date-fns` (dengan locale `id`)**: Formatting waktu relatif Bahasa Indonesia ("3 hari lalu", "kemarin") dan tanggal jatuh tempo.
-4. **`clsx` & `tailwind-merge`**: Utility helper untuk penggabungan kelas Tailwind CSS.
+### Dependensi Tambahan & Alasan Penggunaan
+1. **`zod`**: Schema validation type-safe untuk memastikan validitas data input di client dan API Server. Digunakan untuk memvalidasi syarat password kuat (min. 8 karakter, 1 huruf besar, 1 angka, 1 simbol), format email, sanitasi XSS, serta validasi UUID parameter untuk mencegah manipulasi input dari frontend.
+2. **`framer-motion`**: Menyediakan *micro-interaction* yang sangat halus pada transisi layar (termasuk transisi mulus pada layar *Pendaftaran Berhasil*, animasi collapsible sidebar, serta modal konfirmasi hapus).
+3. **`sonner`**: Library notifikasi *toast* modern yang dikonfigurasi di posisi **Pojok Atas Kanan (`top-right`)** lengkap dengan ikon Lucide murni & tombol *close `x`* interaktif.
+4. **`@supabase/supabase-js` & `@supabase/ssr`**: SDK resmi Supabase untuk mengelola sesi authentikasi berbasis cookie secara aman di Server Components, API Route Handlers, dan Middleware.
+5. **`date-fns` (dengan locale `id`)**: Formatting waktu relatif Bahasa Indonesia ("3 hari lalu", "kemarin") dan tanggal jatuh tempo.
+6. **`clsx` & `tailwind-merge`**: Utility helper untuk penggabungan kelas Tailwind CSS.
 
 ---
 
-## Arsitektur Aplikasi (Enterprise Tier 1 EDA)
+## 🌟 Fitur Utama & Keunggulan Aplikasi
 
-Aplikasi dirancang menggunakan kombinasi **Clean Architecture** dan **Event-Driven Architecture (EDA)** secara terstruktur:
+1. **Sistem Autentikasi Supabase & User Profile Metadata:**
+   - Registrasi pengguna menyertakan **Nama Lengkap / Username** dan **Nomor HP / WhatsApp (opsional)**.
+   - Data nama dan nomor HP tersimpan aman di `user_metadata` Supabase Auth dan ditampilkan di Top Navbar & Sidebar.
+   - **Form Validation:** Pengukuran kekuatan password realtime (Lemah, Sedang, Kuat) dengan *Show/Hide Password Toggle* (`Eye`/`EyeOff`). Tombol pendaftaran otomatis terkunci (*disabled*) hingga seluruh syarat keamanan terpenuhi.
+   - **Template Email HTML Kustom:** Pengiriman email konfirmasi pendaftaran berdesain kustom Soft White & Orange `#D94E15` via **Brevo Custom SMTP**.
+
+2. **Dashboard Overview & Analisis Keuangan:**
+   - **3 Metric Cards:** Total Dihutang ke Saya (Piutang), Total Saya Hutang (Utang), dan Saldo Net (Surplus/Defisit).
+   - **Semi-Circle Gauge Arc Chart:** Visualisasi busur rasio piutang vs utang secara realtime dengan kalkulasi 0% volume transaksi yang akurat.
+
+3. **Manajemen Transaksi Utang Piutang:**
+   - Pencatatan utang piutang dengan format Rupiah utuh (`id-ID`).
+   - Fitur Filter (Semua, Belum Lunas, Lunas), Filter Tipe (Piutang / Utang), Live Search nama orang, dan Sorting (Nominal / Tanggal).
+   - Mode Tampilan List & Grouped (Pengelompokan transaksi berdasarkan nama orang).
+   - Modal Konfirmasi Hapus Kustom (menggantikan browser alert standar).
+
+---
+
+## 🏛️ Arsitektur Aplikasi (Clean Architecture + EDA)
+
+Aplikasi dirancang menggunakan kombinasi **Clean Architecture** dan **Event-Driven Architecture (EDA)**:
 
 ```
 kasbon/
 ├── src/
 │   ├── core/                           # Domain Layer & Event Engine Core
-│   │   ├── events/                     # In-Process EventBus Infrastructure
-│   │   │   ├── domain-events.ts        # Contract Domain Event (CREATED, SETTLED, UPDATED, DELETED)
-│   │   │   └── event-bus.ts            # Singleton EventBus Engine (Publisher/Subscriber)
-│   │   └── domain/                     # Pure Business Domain Models
-│   │       └── models/
-│   │           └── debt.model.ts       # Domain Entities (DebtEntity, SummaryOverview)
+│   │   ├── events/                     # Domain Event Bus (CREATED, SETTLED, UPDATED, DELETED)
+│   │   └── domain/                     # Business Domain Models & Entities
 │   │
-│   ├── application/                    # Application Layer (Use Cases & Ports)
-│   │   └── ports/                      # Secondary Ports / Interface Contracts
-│   │       └── debt-repository.port.ts # Contract Interface Repository Utang Piutang
+│   ├── application/                    # Application Layer (Ports & Interfaces)
+│   │   └── ports/                      # Secondary Ports / Interface Repository
 │   │
 │   ├── infrastructure/                 # Infrastructure & External Adapters
-│   │   └── supabase/                   # Supabase SSR Driver & Data Adapters
-│   │       ├── client.ts               # Supabase Browser Client Adapter
-│   │       ├── server.ts               # Supabase Server Client Adapter (App Router & Server Actions)
-│   │       ├── middleware.ts           # Auth Session Guard & IP Rate Limiting Adapter
-│   │       └── repositories/
-│   │           └── supabase-debt.repository.ts # Implementasi DB Repository dengan Supabase Client
+│   │   └── supabase/                   # Supabase SSR Driver & Data Repositories
 │   │
-│   ├── components/                     # Presentation Layer (UI Component Library)
-│   │   ├── ui/                         # Reusable Primitives
-│   │   │   └── Modal.tsx               # Modal Dialog (Keyboard Listener & Backdrop Blur)
-│   │   ├── dashboard/                  # Dashboard Domain Components
-│   │   │   ├── Header.tsx              # Navbar, Branding, & Logout Trigger
-│   │   │   ├── SummaryCards.tsx        # 3 Card Metric (Total Dihutang, Total Hutang, Net)
-│   │   │   ├── DebtFilter.tsx          # Bar Filter Status, Tipe, & Live Search
-│   │   │   ├── DebtList.tsx            # Renderer Daftar Utang (Loading Skeleton & Empty State)
-│   │   │   └── DebtItem.tsx            # Card Item Transaksi (Aksi Lunas, Edit, Hapus)
-│   │   ├── form/                       # Transaction Form Components
-│   │   │   └── DebtModal.tsx           # Form Modal Catat/Edit (Validasi Zod & Character Counter)
-│   │   └── auth/                       # Authentication Components
-│   │       └── AuthForm.tsx            # Form Login & Signup (Email + Password)
+│   ├── components/                     # Presentation Layer (UI Components)
+│   │   ├── auth/                       # AuthForm.tsx (Login, Signup, Success View)
+│   │   ├── dashboard/                  # Sidebar.tsx, Header.tsx, SummaryCards.tsx, DebtBarChart.tsx, dll.
+│   │   ├── form/                       # DebtModal.tsx
+│   │   └── ui/                         # ConfirmDeleteModal.tsx
 │   │
 │   ├── lib/                            # Shared Utilities & Validations
-│   │   ├── utils.ts                    # Helper Format Rupiah (id-ID) & Relative Time (date-fns)
-│   │   └── validations/
-│   │       └── debt.schema.ts          # Skema Validasi Zod (Client/Server Input & XSS Sanitization)
+│   │   ├── utils.ts                    # Helper Format Rupiah (id-ID) & Relative Time
+│   │   └── validations/                # Skema Validasi Zod (debt.schema.ts)
 │   │
-│   ├── app/                            # Next.js App Router (Routing & API Endpoints)
-│   │   ├── (auth)/                     # Auth Route Group
-│   │   │   ├── login/page.tsx          # Halaman Login (/login)
-│   │   │   └── signup/page.tsx         # Halaman Signup (/signup)
-│   │   ├── (dashboard)/                # Protected App Group
-│   │   │   └── dashboard/page.tsx      # Halaman Utama Dashboard (/dashboard)
-│   │   ├── api/debts/                  # RESTful API Endpoints
-│   │   │   ├── route.ts                # Handler GET (List) & POST (Create)
-│   │   │   └── [id]/route.ts           # Handler PATCH (Update/Settle) & DELETE (Remove)
-│   │   ├── globals.css                 # Tailwind CSS v4 Global Directive
-│   │   ├── layout.tsx                  # Root HTML/Body Layout
-│   │   └── page.tsx                    # Root Route Redirect (/ -> /dashboard)
-│   └── middleware.ts                   # Next.js Global Middleware Entrypoint
+│   └── app/                            # Next.js App Router (Pages & REST API Routes)
+│       ├── (auth)/                     # Auth Route Group (/login, /signup)
+│       ├── (dashboard)/                # Protected Route Group (/dashboard)
+│       └── api/debts/                  # RESTful API Endpoints
 │
 └── supabase/
-    └── migrations/
-        └── 20260903000000_create_debts_table.sql # Migration SQL (Tabel debts, Index, & Strict RLS)
+    └── migrations/                     # Migration SQL (Tabel debts, Indexing, & RLS Strict)
 ```
 
 ---
 
-## Setup & Panduan Lokal
+## 🛠️ Setup & Panduan Menjalankan Lokal
 
 ### 1. Environment Variables (`.env.local`)
-Buat file `.env.local` di direktori utama project dan isi kredensial Supabase:
+Buat file `.env.local` di root project dan masukkan kredensial Supabase:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 ### 2. Migrasi Database (Supabase)
-Jalankan skrip SQL migration dari `supabase/migrations/20260903000000_create_debts_table.sql` di SQL Editor Supabase:
+Eksekusi file SQL migration dari `supabase/migrations/20260903000000_create_debts_table.sql` di SQL Editor Supabase:
 - Tabel `debts` dengan kolom `amount` ber-tipe `bigint` untuk nominal Rupiah utuh.
 - Performance indexing pada `(user_id, status, type)`.
 - Kebijakan **Row Level Security (RLS) strict** (`auth.uid() = user_id`) untuk mengisolasi data antar pengguna.
@@ -112,17 +113,17 @@ Buka browser di `http://localhost:3000`.
 
 ---
 
-## Pendekatan Teknis & Keamanan
+## 💬 Jawaban Pertanyaan Hiring Brief (Approach, Trade-off, & Time Spent)
 
-1. **Event-Driven Architecture (EDA)**: Setiap perubahan transaksi (`DEBT_CREATED`, `DEBT_SETTLED`, `DEBT_UPDATED`, `DEBT_DELETED`) menerbitkan domain event melalui EventBus terdekopel untuk memisahkan logika operasi database dari kalkulasi ringkasan.
-2. **Zero-Trust Security & Input Sanitization**: Sanitasi XSS Injection pada input teks, pembatas nominal angka utuh (maksimal Rp 1 Triliun), validasi UUID pada parameter ID, serta penambahan Security Headers (`X-Frame-Options`, `X-Content-Type-Options`).
-3. **Middleware Rate Limiting**: Proteksi rate limit berbasis IP untuk mencegah serangan brute-force login/signup (maksimal 10 request/menit) dan DDoS API flooding (maksimal 60 request/menit).
-4. **API Versioning**: Konfigurasi rewrites di `next.config.ts` untuk mendukung alias `/api/v1/debts` tanpa mengubah endpoint `/api/debts`.
+### 1. Technical Approach (Keputusan Teknis yang Dibanggakan)
+> *"Saya sangat bangga menerapkan kombinasi **Clean Architecture** dan **Event-Driven Architecture (EDA)** di Next.js App Router. Penggunaan Domain EventBus terdekopel memisahkan operasi database Supabase dengan pengolahan event log, sementara validasi Zod ketat di client & server API memastikan **Zero-Trust Security** (mencegah XSS & manipulasi input). Ditambah visualisasi **Semi-Circle Gauge Arc Chart** dan transisi UI mulus yang membuat UX aplikasi terasa sangat premium."*
+
+### 2. Trade-off (Jika Ada Waktu 1 Hari Lagi)
+> *"Jika memiliki waktu 1 hari tambahan, saya akan mengimplementasikan fitur **Ekspor Laporan Transaksi ke PDF/CSV**, integrasi **Pengingat Jatuh Tempo otomatis via WhatsApp API (Twilio/WATI)**, serta fitur **Dark Mode Toggle** menggunakan CSS variables."*
+
+### 3. Time Spent (Alokasi Waktu Pengerjaan)
+> *"Total waktu pengerjaan sekitar **8 - 9 jam** secara intensif, mencakup perancangan schema database + RLS, pembuatan arsitektur EventBus & Repositori, pembuatan komponen UI responsif, integrasi Supabase Auth + Brevo SMTP Custom HTML Template, hingga refactoring validasi Zod."*
 
 ---
 
-## Tautan & Portofolio
-
-- **Repository GitHub:** [https://github.com/defaaryawar/Kasbon](https://github.com/defaaryawar/Kasbon)
-- **Live Demo Vercel:** [https://kasbon.vercel.app](https://kasbon.vercel.app)
-- **Portfolio Developer:** [https://defanolabs.com](https://defanolabs.com)
+© 2026 **Kasbon**. Developed by **Defano Arya Wardhana**.
