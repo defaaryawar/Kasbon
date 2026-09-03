@@ -44,7 +44,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const body = await request.json();
 
-    // Check if this is a "mark settled" action
     if (body.action === "settle" || body.settled === true) {
       const settled = await repository.settle(id, user.id);
 
@@ -68,7 +67,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    // Otherwise, perform regular update
     const parseResult = debtFormSchema.partial().safeParse(body);
     if (!parseResult.success) {
       const firstError = parseResult.error.issues[0]?.message || "Data input tidak valid";

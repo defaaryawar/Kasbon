@@ -5,7 +5,6 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)!;
 
-// Sliding window Rate Limiter (In-Memory per IP)
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(
@@ -16,14 +15,13 @@ function isRateLimited(
   const now = Date.now();
   const entry = rateLimitStore.get(identifier);
 
-  // Clean up expired entry or set initial
   if (!entry || now > entry.resetAt) {
     rateLimitStore.set(identifier, { count: 1, resetAt: now + windowMs });
     return false;
   }
 
   if (entry.count >= limit) {
-    return true; // Exceeded limit
+    return true;
   }
 
   entry.count += 1;
@@ -38,7 +36,6 @@ export const updateSession = async (request: NextRequest) => {
 
   const path = request.nextUrl.pathname;
 
-  // 1. Rate Limiting untuk Login & Signup (Max 10 request per menit per IP untuk mencegah brute-force)
   if (path.startsWith("/login") || path.startsWith("/signup")) {
     const isLimited = isRateLimited(`auth:${ip}`, 10, 60 * 1000);
     if (isLimited && request.method === "POST") {
@@ -52,7 +49,6 @@ export const updateSession = async (request: NextRequest) => {
     }
   }
 
-  // 2. Rate Limiting untuk API Endpoints (Max 60 request per menit per IP untuk mencegah DDoS/Flooding)
   if (path.startsWith("/api/")) {
     const isLimited = isRateLimited(`api:${ip}`, 60, 60 * 1000);
     if (isLimited) {
