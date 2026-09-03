@@ -1,6 +1,6 @@
 # Kasbon - Aplikasi Track Utang Piutang Pribadi
 
-Kasbon adalah web application sederhana berbasis **Next.js 16 (App Router)** untuk mencatat dan memantau transaksi utang piutang pribadi. Aplikasi ini memungkinkan pengguna mencatat pihak terkait, nominal transaksi, memantau saldo bersih (*Net*), serta mengubah status transaksi menjadi lunas.
+Kasbon adalah web application berbasis **Next.js 16 (App Router)** untuk mencatat dan memantau transaksi utang piutang pribadi. Aplikasi ini memungkinkan pengguna mencatat pihak terkait, nominal transaksi, memantau saldo bersih (*Net*), serta mengelola status transaksi secara lunas atau belum lunas.
 
 ---
 
@@ -22,24 +22,67 @@ Kasbon adalah web application sederhana berbasis **Next.js 16 (App Router)** unt
 
 ## Arsitektur Aplikasi (Enterprise Tier 1 EDA)
 
-Aplikasi dirancang menggunakan kombinasi **Clean Architecture** dan **Event-Driven Architecture (EDA)**:
+Aplikasi dirancang menggunakan kombinasi **Clean Architecture** dan **Event-Driven Architecture (EDA)** secara terstruktur:
 
 ```
-src/
-├── core/                       # Domain Entities & Core Event Engine
-│   ├── events/                 # EventBus Engine & Domain Event Definitions
-│   └── domain/                 # Models & Business Value Objects (Rupiah VO)
-├── application/                # Layer Use Cases & Ports
-│   ├── ports/                  # Interface Contracts (DebtRepositoryPort)
-│   └── use-cases/              # Workflows bisnis terpisah
-├── infrastructure/             # Adapters & Supabase Driver
-│   └── supabase/               # Supabase SSR Clients & SupabaseDebtRepository
-├── components/                 # UI Components
-│   ├── ui/                     # Primitives (Modal, Badges, Buttons)
-│   ├── dashboard/              # SummaryCards, DebtFilter, DebtList, DebtItem
-│   ├── form/                   # DebtModal (Form Catat/Edit)
-│   └── auth/                   # AuthForm (Login & Signup)
-└── app/                        # Next.js App Router Routes & REST API Endpoints
+kasbon/
+├── src/
+│   ├── core/                           # Domain Layer & Event Engine Core
+│   │   ├── events/                     # In-Process EventBus Infrastructure
+│   │   │   ├── domain-events.ts        # Contract Domain Event (CREATED, SETTLED, UPDATED, DELETED)
+│   │   │   └── event-bus.ts            # Singleton EventBus Engine (Publisher/Subscriber)
+│   │   └── domain/                     # Pure Business Domain Models
+│   │       └── models/
+│   │           └── debt.model.ts       # Domain Entities (DebtEntity, SummaryOverview)
+│   │
+│   ├── application/                    # Application Layer (Use Cases & Ports)
+│   │   └── ports/                      # Secondary Ports / Interface Contracts
+│   │       └── debt-repository.port.ts # Contract Interface Repository Utang Piutang
+│   │
+│   ├── infrastructure/                 # Infrastructure & External Adapters
+│   │   └── supabase/                   # Supabase SSR Driver & Data Adapters
+│   │       ├── client.ts               # Supabase Browser Client Adapter
+│   │       ├── server.ts               # Supabase Server Client Adapter (App Router & Server Actions)
+│   │       ├── middleware.ts           # Auth Session Guard & IP Rate Limiting Adapter
+│   │       └── repositories/
+│   │           └── supabase-debt.repository.ts # Implementasi DB Repository dengan Supabase Client
+│   │
+│   ├── components/                     # Presentation Layer (UI Component Library)
+│   │   ├── ui/                         # Reusable Primitives
+│   │   │   └── Modal.tsx               # Modal Dialog (Keyboard Listener & Backdrop Blur)
+│   │   ├── dashboard/                  # Dashboard Domain Components
+│   │   │   ├── Header.tsx              # Navbar, Branding, & Logout Trigger
+│   │   │   ├── SummaryCards.tsx        # 3 Card Metric (Total Dihutang, Total Hutang, Net)
+│   │   │   ├── DebtFilter.tsx          # Bar Filter Status, Tipe, & Live Search
+│   │   │   ├── DebtList.tsx            # Renderer Daftar Utang (Loading Skeleton & Empty State)
+│   │   │   └── DebtItem.tsx            # Card Item Transaksi (Aksi Lunas, Edit, Hapus)
+│   │   ├── form/                       # Transaction Form Components
+│   │   │   └── DebtModal.tsx           # Form Modal Catat/Edit (Validasi Zod & Character Counter)
+│   │   └── auth/                       # Authentication Components
+│   │       └── AuthForm.tsx            # Form Login & Signup (Email + Password)
+│   │
+│   ├── lib/                            # Shared Utilities & Validations
+│   │   ├── utils.ts                    # Helper Format Rupiah (id-ID) & Relative Time (date-fns)
+│   │   └── validations/
+│   │       └── debt.schema.ts          # Skema Validasi Zod (Client/Server Input & XSS Sanitization)
+│   │
+│   ├── app/                            # Next.js App Router (Routing & API Endpoints)
+│   │   ├── (auth)/                     # Auth Route Group
+│   │   │   ├── login/page.tsx          # Halaman Login (/login)
+│   │   │   └── signup/page.tsx         # Halaman Signup (/signup)
+│   │   ├── (dashboard)/                # Protected App Group
+│   │   │   └── dashboard/page.tsx      # Halaman Utama Dashboard (/dashboard)
+│   │   ├── api/debts/                  # RESTful API Endpoints
+│   │   │   ├── route.ts                # Handler GET (List) & POST (Create)
+│   │   │   └── [id]/route.ts           # Handler PATCH (Update/Settle) & DELETE (Remove)
+│   │   ├── globals.css                 # Tailwind CSS v4 Global Directive
+│   │   ├── layout.tsx                  # Root HTML/Body Layout
+│   │   └── page.tsx                    # Root Route Redirect (/ -> /dashboard)
+│   └── middleware.ts                   # Next.js Global Middleware Entrypoint
+│
+└── supabase/
+    └── migrations/
+        └── 20260903000000_create_debts_table.sql # Migration SQL (Tabel debts, Index, & Strict RLS)
 ```
 
 ---
@@ -71,7 +114,6 @@ Buka browser di `http://localhost:3000`.
 
 ## Pendekatan Teknis & Keamanan
 
-### Keputusan Teknis Utama
 1. **Event-Driven Architecture (EDA)**: Setiap perubahan transaksi (`DEBT_CREATED`, `DEBT_SETTLED`, `DEBT_UPDATED`, `DEBT_DELETED`) menerbitkan domain event melalui EventBus terdekopel untuk memisahkan logika operasi database dari kalkulasi ringkasan.
 2. **Zero-Trust Security & Input Sanitization**: Sanitasi XSS Injection pada input teks, pembatas nominal angka utuh (maksimal Rp 1 Triliun), validasi UUID pada parameter ID, serta penambahan Security Headers (`X-Frame-Options`, `X-Content-Type-Options`).
 3. **Middleware Rate Limiting**: Proteksi rate limit berbasis IP untuk mencegah serangan brute-force login/signup (maksimal 10 request/menit) dan DDoS API flooding (maksimal 60 request/menit).
@@ -79,20 +121,8 @@ Buka browser di `http://localhost:3000`.
 
 ---
 
-## Pertimbangan & Pengembangan Mendatang
+## Tautan & Portofolio
 
-Jika memiliki waktu 1 hari lebih banyak:
-1. **Ekspor Laporan PDF/Excel**: Menambahkan fitur unduh rekapitulasi data utang piutang.
-2. **Notifikasi Automatic Reminder**: Mengirimkan pengingat jatuh tempo via WhatsApp/Email.
-3. **Optimistic UI Updates**: Meningkatkan responsivitas UI dengan pembaruan status transaksi instan di layar sebelum response server kembali.
-
----
-
-## Waktu Pengerjaan
-- **Total Waktu Pengerjaan:** ± 3.5 jam (Perancangan schema & RLS, Arsitektur EDA, API Endpoints, UI Components, Security Hardening & Rate Limiting).
-
----
-
-## Tautan Demo & Repository
-- **Vercel Deploy:** `https://kasbon-demo.vercel.app`
-- **Repository GitHub:** `https://github.com/your-username/kasbon`
+- **Repository GitHub:** [https://github.com/defaaryawar/Kasbon](https://github.com/defaaryawar/Kasbon)
+- **Live Demo Vercel:** [https://kasbon.vercel.app](https://kasbon.vercel.app)
+- **Portfolio Developer:** [https://defanolabs.com](https://defanolabs.com)
