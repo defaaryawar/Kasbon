@@ -22,12 +22,17 @@ export function DebtBarChart({
     piutangPercent = Math.round(Number((owedVal * BigInt(100)) / totalVolume));
     utangPercent = 100 - piutangPercent;
   } else {
-    piutangPercent = 100;
+    // When volume is 0, both percentages are 0%
+    piutangPercent = 0;
+    utangPercent = 0;
   }
 
   const radius = 60;
   const halfCircumference = Math.PI * radius; // ~188.5
-  const strokeDashoffset = halfCircumference - (halfCircumference * piutangPercent) / 100;
+  // If totalVolume is 0, offset is full circumference (0% arc)
+  const strokeDashoffset = totalVolume > BigInt(0)
+    ? halfCircumference - (halfCircumference * piutangPercent) / 100
+    : halfCircumference;
 
   const netVal = owedVal - oweVal;
   const isNetPositive = netVal >= BigInt(0);
@@ -82,7 +87,7 @@ export function DebtBarChart({
 
             <div className="absolute top-11 flex flex-col items-center text-center">
               <span className="text-2xl font-black text-zinc-900 tracking-tight leading-none">
-                {totalVolume > BigInt(0) ? `${piutangPercent}%` : "100%"}
+                {piutangPercent}%
               </span>
               <span className="text-[10px] font-bold text-zinc-500 mt-1">
                 Rasio Piutang
@@ -107,13 +112,13 @@ export function DebtBarChart({
                 Dihutang ke Saya (Piutang)
               </span>
               <span className="text-zinc-900 font-extrabold">
-                {formatRupiah(owedVal)}
+                {formatRupiah(owedVal)} ({piutangPercent}%)
               </span>
             </div>
             <div className="h-3 w-full bg-zinc-100 rounded-md overflow-hidden">
               <div
                 className="h-full bg-[#D94E15] rounded-md transition-all duration-500"
-                style={{ width: `${Math.max(piutangPercent, 3)}%` }}
+                style={{ width: `${piutangPercent}%` }}
               />
             </div>
           </div>
@@ -126,20 +131,20 @@ export function DebtBarChart({
                 Saya Hutang (Utang)
               </span>
               <span className="text-zinc-900 font-extrabold">
-                {formatRupiah(oweVal)}
+                {formatRupiah(oweVal)} ({utangPercent}%)
               </span>
             </div>
             <div className="h-3 w-full bg-zinc-100 rounded-md overflow-hidden">
               <div
                 className="h-full bg-zinc-400 rounded-md transition-all duration-500"
-                style={{ width: `${Math.max(utangPercent, 3)}%` }}
+                style={{ width: `${utangPercent}%` }}
               />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Row: Net Summary (Bahasa Indonesia Kasual & Jelas) */}
+      {/* Bottom Row: Net Summary */}
       <div className="mt-4 pt-3 border-t border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs bg-zinc-50/70 p-3 rounded-lg">
         <div className="flex items-center gap-2">
           <Scale className="w-4 h-4 text-[#D94E15]" />
