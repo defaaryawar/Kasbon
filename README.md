@@ -85,6 +85,7 @@ kasbon/
 │   │   ├── auth/
 │   │   │   └── AuthForm.tsx                    # Login/Signup Form, Password Evaluator, & Success Screen
 │   │   ├── dashboard/                          # Dashboard Feature Components
+│   │   │   ├── DashboardClient.tsx             # Client Interactivity Container (Filters, Search, Modals)
 │   │   │   ├── DebtBarChart.tsx                # Semi-Circle Gauge Arc Chart & Ratio Comparison
 │   │   │   ├── DebtFilter.tsx                  # Status/Type Filter Toolbar & Live Search Input
 │   │   │   ├── DebtItem.tsx                    # Transaction Card Item with Settle/Edit/Delete Actions

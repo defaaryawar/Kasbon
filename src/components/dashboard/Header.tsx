@@ -29,8 +29,7 @@ export function Header({
       setIsLoggingOut(true);
       const supabase = createClient();
       await supabase.auth.signOut();
-      router.push("/login");
-      router.refresh();
+      window.location.href = "/login";
     } catch (error) {
       console.error("Logout error:", error);
       setIsLoggingOut(false);

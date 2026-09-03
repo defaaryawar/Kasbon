@@ -157,8 +157,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           icon: <CheckCircle2 className="w-4 h-4 text-[#D94E15]" />,
         });
 
-        router.push("/dashboard");
-        router.refresh();
+        window.location.href = "/dashboard";
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Terjadi kesalahan autentikasi";
