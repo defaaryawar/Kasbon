@@ -27,6 +27,7 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("created_desc");
   const [viewMode, setViewMode] = useState<"list" | "grouped">("list");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -123,24 +124,35 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f4f5] font-sans text-zinc-900 flex flex-col md:flex-row">
-      <Sidebar userEmail={userEmail} onOpenCreateModal={handleOpenCreate} />
+    <div className="min-h-screen bg-[#F8FAFC] font-sans text-zinc-900 flex flex-col md:flex-row">
+      <Sidebar
+        userEmail={userEmail}
+        isCollapsed={isSidebarCollapsed}
+        onOpenCreateModal={handleOpenCreate}
+      />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <Header userEmail={userEmail} />
+        <Header
+          userEmail={userEmail}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
 
-        <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 pb-12">
+        <main className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-8 pt-6 pb-12">
+          {/* Row 1: Summary Cards */}
           <SummaryCards
             totalOwedToMe={summary.totalOwedToMe}
             totalIOwe={summary.totalIOwe}
             net={summary.net}
           />
 
+          {/* Row 2: Sleek Gauge Chart */}
           <DebtBarChart
             totalOwedToMe={summary.totalOwedToMe}
             totalIOwe={summary.totalIOwe}
           />
 
+          {/* Row 3: Filter Toolbar */}
           <DebtFilter
             statusFilter={statusFilter}
             typeFilter={typeFilter}
@@ -154,6 +166,7 @@ export default function DashboardPage() {
             onViewModeChange={setViewMode}
           />
 
+          {/* Row 4: Debt List / Grouped List */}
           {viewMode === "list" ? (
             <DebtList
               debts={debts}

@@ -39,7 +39,7 @@ export function GroupedDebtList({
         {[1, 2].map((i) => (
           <div
             key={i}
-            className="h-20 rounded-2xl bg-[#181818] animate-pulse"
+            className="h-20 rounded-xl bg-white border border-zinc-200/80 animate-pulse"
           />
         ))}
       </div>
@@ -48,7 +48,7 @@ export function GroupedDebtList({
 
   if (debts.length === 0) {
     return (
-      <div className="p-8 text-center rounded-2xl bg-[#181818] border border-dashed border-zinc-800 text-zinc-400 text-xs">
+      <div className="p-8 text-center rounded-xl bg-white border border-dashed border-zinc-200 text-zinc-500 text-xs font-semibold shadow-2xs">
         Belum ada catatan transaksi.
       </div>
     );
@@ -100,22 +100,22 @@ export function GroupedDebtList({
         return (
           <div
             key={group.name}
-            className="rounded-2xl border border-zinc-800/80 bg-[#181818] overflow-hidden"
+            className="rounded-xl border border-zinc-200/90 bg-white shadow-2xs overflow-hidden"
           >
             {/* Group Header */}
             <div
               onClick={() => toggleExpand(group.name)}
-              className="p-4 flex items-center justify-between gap-3 cursor-pointer hover:bg-zinc-800/40 transition-colors"
+              className="p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:bg-zinc-50 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-zinc-800 text-[#D94E15]">
+                <div className="p-2 rounded-lg bg-zinc-100 text-[#D94E15]">
                   <User className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">
+                  <h3 className="text-xs font-bold text-zinc-900">
                     {group.name}
                   </h3>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-[11px] text-zinc-500 font-medium">
                     {group.items.length} transaksi ({group.unsettledCount} belum lunas)
                   </p>
                 </div>
@@ -123,13 +123,13 @@ export function GroupedDebtList({
 
               <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <div className="text-xs text-zinc-500">Net</div>
-                  <div className="text-sm font-extrabold text-[#D94E15]">
+                  <div className="text-[10px] text-zinc-400 font-medium">Net</div>
+                  <div className="text-xs font-extrabold text-[#D94E15]">
                     {formatRupiah(group.net)}
                   </div>
                 </div>
 
-                <div className="text-zinc-500">
+                <div className="text-zinc-400">
                   {isExpanded ? (
                     <ChevronUp className="w-4 h-4" />
                   ) : (
@@ -141,7 +141,7 @@ export function GroupedDebtList({
 
             {/* Group Items */}
             {isExpanded && (
-              <div className="p-4 space-y-3 border-t border-zinc-800/80 bg-[#141414]">
+              <div className="p-3.5 space-y-2.5 border-t border-zinc-100 bg-zinc-50/50">
                 {group.items.map((debt) => (
                   <DebtItem
                     key={debt.id}

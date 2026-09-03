@@ -26,7 +26,7 @@ export function DebtList({
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-20 rounded-2xl bg-white dark:bg-[#181818] border border-zinc-200 dark:border-zinc-800/60 animate-pulse"
+            className="h-20 rounded-xl bg-white border border-zinc-200/80 animate-pulse"
           />
         ))}
       </div>
@@ -35,17 +35,20 @@ export function DebtList({
 
   if (debts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-10 text-center rounded-2xl bg-white dark:bg-[#181818] border border-dashed border-zinc-200 dark:border-zinc-800 shadow-xs">
+      <div className="flex flex-col items-center justify-center p-10 text-center rounded-xl bg-white border border-dashed border-zinc-200/90 shadow-2xs">
         <Receipt className="w-7 h-7 text-zinc-400 mb-2" />
-        <h3 className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+        <h3 className="text-xs font-bold text-zinc-700">
           Belum ada catatan transaksi.
         </h3>
+        <p className="text-[11px] text-zinc-400 mt-0.5">
+          Klik &ldquo;+ Catat Baru&rdquo; untuk menambahkan catatan utang atau piutang pertama kamu.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {debts.map((debt) => (
         <DebtItem
           key={debt.id}
