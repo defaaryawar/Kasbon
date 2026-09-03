@@ -3,13 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/infrastructure/supabase/client";
-import { LogOut, ChevronDown } from "lucide-react";
+import { LogOut, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 interface HeaderProps {
   userEmail: string;
+  isSidebarCollapsed: boolean;
+  onToggleSidebar: () => void;
 }
 
-export function Header({ userEmail }: HeaderProps) {
+export function Header({
+  userEmail,
+  isSidebarCollapsed,
+  onToggleSidebar,
+}: HeaderProps) {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -30,28 +36,47 @@ export function Header({ userEmail }: HeaderProps) {
   const initial = userEmail ? userEmail[0].toUpperCase() : "U";
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800/60 mb-6">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <h1 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
-          Dashboard Utang Piutang
-        </h1>
+    <header className="sticky top-0 z-30 w-full h-16 bg-white border-b border-zinc-200/90 px-4 sm:px-6 flex items-center justify-between shadow-xs">
+      <div className="flex items-center gap-3">
+        {/* Sidebar Collapse/Expand Toggle Button */}
+        <button
+          onClick={onToggleSidebar}
+          className="p-2 rounded-xl text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition-colors cursor-pointer"
+          title={isSidebarCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
+        >
+          {isSidebarCollapsed ? (
+            <PanelLeftOpen className="w-5 h-5" />
+          ) : (
+            <PanelLeftClose className="w-5 h-5" />
+          )}
+        </button>
 
-        {/* Profile Trigger (Clean & Borderless) */}
+        <div>
+          <h1 className="text-base sm:text-lg font-extrabold text-zinc-900 tracking-tight leading-none">
+            Dashboard
+          </h1>
+          <p className="text-[11px] text-zinc-500 font-medium hidden sm:block mt-0.5">
+            Kelola pencatatan utang & piutang pribadi kamu
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        {/* User Profile Trigger */}
         <div className="relative">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-2 text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+            className="flex items-center gap-2.5 p-1.5 sm:px-3 sm:py-1.5 rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-full bg-[#D94E15] text-white flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-[#D94E15]/20 shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#D94E15] text-white flex items-center justify-center font-extrabold text-xs shadow-xs ring-2 ring-[#D94E15]/20 shrink-0">
               {initial}
             </div>
-            <span className="hidden sm:inline max-w-[160px] truncate">
+            <span className="hidden sm:inline text-xs font-bold text-zinc-800 max-w-[160px] truncate">
               {userEmail}
             </span>
-            <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
           </button>
 
-          {/* Interactive Profile Dropdown Menu */}
           {isOpen && (
             <>
               <div
@@ -59,10 +84,10 @@ export function Header({ userEmail }: HeaderProps) {
                 className="fixed inset-0 z-40"
               />
 
-              <div className="absolute right-0 mt-2 w-56 p-2 rounded-2xl bg-white dark:bg-[#181818] border border-zinc-200 dark:border-zinc-800 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 mb-1">
-                  <p className="text-[11px] text-zinc-400 font-medium">Masuk sebagai</p>
-                  <p className="text-xs font-bold text-zinc-900 dark:text-white truncate mt-0.5">
+              <div className="absolute right-0 mt-2 w-56 p-2 rounded-2xl bg-white border border-zinc-200 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-3 py-2 border-b border-zinc-100 mb-1">
+                  <p className="text-[11px] text-zinc-400 font-medium">Pengguna</p>
+                  <p className="text-xs font-bold text-zinc-900 truncate mt-0.5">
                     {userEmail}
                   </p>
                 </div>
@@ -70,7 +95,7 @@ export function Header({ userEmail }: HeaderProps) {
                 <button
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer disabled:opacity-50"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>{isLoggingOut ? "Mengeluarkan..." : "Logout"}</span>
