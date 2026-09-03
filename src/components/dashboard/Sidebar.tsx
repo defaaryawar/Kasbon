@@ -89,7 +89,7 @@ export function Sidebar({
         } ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
         <div className="space-y-6">
-          {/* Brand Logo Header (Aligned with Header height h-16) */}
+          {/* Brand Logo Header */}
           <div className={`flex items-center h-10 ${isCollapsed ? "justify-center" : "gap-3 px-1"}`}>
             <div className="w-9 h-9 rounded-xl bg-[#D94E15] flex items-center justify-center font-black text-white text-lg shadow-md shadow-[#D94E15]/20 shrink-0">
               K
@@ -128,6 +128,7 @@ export function Sidebar({
                 MENU
               </div>
             )}
+            {/* Active Item: Dashboard */}
             <a
               href="/dashboard"
               title="Dashboard"
@@ -139,24 +140,44 @@ export function Sidebar({
               {!isCollapsed && <span>Dashboard</span>}
             </a>
 
-            <div
-              title="Tabel Transaksi"
-              className={`flex items-center gap-3 py-2.5 rounded-xl text-zinc-400 hover:bg-zinc-50 font-medium text-sm transition-colors cursor-not-allowed opacity-60 ${
-                isCollapsed ? "justify-center px-0" : "px-3.5"
-              }`}
-            >
-              <Receipt className="w-4.5 h-4.5 shrink-0" />
-              {!isCollapsed && <span>Tabel Transaksi</span>}
+            {/* Coming Soon Item 1: Tabel Transaksi */}
+            <div className="relative group">
+              <div
+                className={`flex items-center gap-3 py-2.5 rounded-xl text-zinc-400 hover:bg-zinc-50 font-medium text-sm transition-colors cursor-not-allowed ${
+                  isCollapsed ? "justify-center px-0" : "px-3.5"
+                }`}
+              >
+                <Receipt className="w-4.5 h-4.5 shrink-0 text-zinc-400" />
+                {!isCollapsed && <span>Tabel Transaksi</span>}
+              </div>
+
+              {/* Pure Text Soft White Tooltip */}
+              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none animate-in fade-in zoom-in-95 duration-150">
+                <div className="w-2 h-2 bg-white border-b border-l border-zinc-200 rotate-45 -mr-1 shrink-0 z-10" />
+                <div className="bg-white text-zinc-900 border border-zinc-200/90 text-[11px] font-semibold px-3 py-1.5 rounded-xl shadow-md whitespace-nowrap">
+                  Fitur Tabel Transaksi sedang dalam pengembangan
+                </div>
+              </div>
             </div>
 
-            <div
-              title="Pengaturan"
-              className={`flex items-center gap-3 py-2.5 rounded-xl text-zinc-400 hover:bg-zinc-50 font-medium text-sm transition-colors cursor-not-allowed opacity-60 ${
-                isCollapsed ? "justify-center px-0" : "px-3.5"
-              }`}
-            >
-              <Settings className="w-4.5 h-4.5 shrink-0" />
-              {!isCollapsed && <span>Pengaturan</span>}
+            {/* Coming Soon Item 2: Pengaturan */}
+            <div className="relative group">
+              <div
+                className={`flex items-center gap-3 py-2.5 rounded-xl text-zinc-400 hover:bg-zinc-50 font-medium text-sm transition-colors cursor-not-allowed ${
+                  isCollapsed ? "justify-center px-0" : "px-3.5"
+                }`}
+              >
+                <Settings className="w-4.5 h-4.5 shrink-0 text-zinc-400" />
+                {!isCollapsed && <span>Pengaturan</span>}
+              </div>
+
+              {/* Pure Text Soft White Tooltip */}
+              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none animate-in fade-in zoom-in-95 duration-150">
+                <div className="w-2 h-2 bg-white border-b border-l border-zinc-200 rotate-45 -mr-1 shrink-0 z-10" />
+                <div className="bg-white text-zinc-900 border border-zinc-200/90 text-[11px] font-semibold px-3 py-1.5 rounded-xl shadow-md whitespace-nowrap">
+                  Fitur Pengaturan sedang dalam pengembangan
+                </div>
+              </div>
             </div>
           </nav>
         </div>

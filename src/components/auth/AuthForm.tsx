@@ -29,9 +29,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
     const parseResult = authFormSchema.safeParse({ email, password });
     if (!parseResult.success) {
-      setErrorMessage(
-        parseResult.error.issues[0]?.message || "Input tidak valid"
-      );
+      setErrorMessage(parseResult.error.issues[0]?.message || "Input tidak valid");
       return;
     }
 
@@ -65,15 +63,12 @@ export function AuthForm({ mode }: AuthFormProps) {
         router.refresh();
       }
     } catch (err) {
-      setErrorMessage(
-        err instanceof Error ? err.message : "Terjadi kesalahan autentikasi"
-      );
+      setErrorMessage(err instanceof Error ? err.message : "Terjadi kesalahan autentikasi");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Hero Section (Only visible on Desktop lg:flex - Soft White Theme)
   const HeroSection = (
     <motion.div
       key={`hero-${mode}`}
@@ -102,7 +97,8 @@ export function AuthForm({ mode }: AuthFormProps) {
           <span className="text-[#D94E15]">tanpa ribet.</span>
         </h2>
         <p className="text-sm text-zinc-600 max-w-sm leading-relaxed">
-          Catat siapa hutang berapa, pantau saldo net kamu secara realtime, dan kelola keuangan pribadi dengan simpel dan rapi.
+          Catat siapa hutang berapa, pantau saldo net kamu secara realtime, dan kelola keuangan
+          pribadi dengan simpel dan rapi.
         </p>
 
         <div className="pt-3 space-y-2.5">
@@ -174,9 +170,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           )}
 
           <div>
-            <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-              Email
-            </label>
+            <label className="block text-xs font-medium text-zinc-700 mb-1.5">Email</label>
             <input
               type="email"
               placeholder="nama@email.com"
@@ -188,9 +182,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-              Password
-            </label>
+            <label className="block text-xs font-medium text-zinc-700 mb-1.5">Password</label>
             <input
               type="password"
               placeholder="••••••••"
@@ -221,20 +213,14 @@ export function AuthForm({ mode }: AuthFormProps) {
           {isLogin ? (
             <span>
               Belum punya akun?{" "}
-              <Link
-                href="/signup"
-                className="font-bold text-[#D94E15] hover:underline"
-              >
+              <Link href="/signup" className="font-bold text-[#D94E15] hover:underline">
                 Daftar sekarang
               </Link>
             </span>
           ) : (
             <span>
               Sudah punya akun?{" "}
-              <Link
-                href="/login"
-                className="font-bold text-[#D94E15] hover:underline"
-              >
+              <Link href="/login" className="font-bold text-[#D94E15] hover:underline">
                 Masuk di sini
               </Link>
             </span>

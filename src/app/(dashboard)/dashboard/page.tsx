@@ -9,8 +9,11 @@ import { DebtFilter } from "@/components/dashboard/DebtFilter";
 import { DebtList } from "@/components/dashboard/DebtList";
 import { GroupedDebtList } from "@/components/dashboard/GroupedDebtList";
 import { DebtModal } from "@/components/form/DebtModal";
+import { ConfirmDeleteModal } from "@/components/ui/ConfirmDeleteModal";
 import { SerializedDebt } from "@/components/dashboard/DebtItem";
 import { createClient } from "@/infrastructure/supabase/client";
+import { toast } from "sonner";
+import { CheckCircle2, Trash2, AlertCircle } from "lucide-react";
 
 export default function DashboardPage() {
   const [userEmail, setUserEmail] = useState("");
@@ -32,6 +35,9 @@ export default function DashboardPage() {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDebt, setEditingDebt] = useState<SerializedDebt | null>(null);
+
+  const [deletingDebt, setDeletingDebt] = useState<SerializedDebt | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -83,32 +89,61 @@ export default function DashboardPage() {
       });
 
       if (res.ok) {
+        toast.success("Transaksi berhasil ditandai lunas!", {
+          icon: <CheckCircle2 className="w-4 h-4 text-[#D94E15]" />,
+        });
         await fetchDebts();
+      } else {
+        toast.error("Gagal mengubah status lunas", {
+          icon: <AlertCircle className="w-4 h-4 text-rose-600" />,
+        });
       }
     } catch (error) {
       console.error("Error settling debt:", error);
+      toast.error("Terjadi kesalahan koneksi", {
+        icon: <AlertCircle className="w-4 h-4 text-rose-600" />,
+      });
     } finally {
       setProcessingId(null);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Apakah kamu yakin ingin menghapus catatan transaksi ini?")) {
-      return;
+  const onRequestDelete = (id: string) => {
+    const target = debts.find((d) => d.id === id);
+    if (target) {
+      setDeletingDebt(target);
     }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingDebt) return;
 
     try {
-      setProcessingId(id);
-      const res = await fetch(`/api/debts/${id}`, {
+      setIsDeleting(true);
+      setProcessingId(deletingDebt.id);
+
+      const res = await fetch(`/api/debts/${deletingDebt.id}`, {
         method: "DELETE",
       });
 
       if (res.ok) {
+        toast.success(`Catatan transaksi dengan ${deletingDebt.counterpartName} berhasil dihapus`, {
+          icon: <Trash2 className="w-4 h-4 text-[#D94E15]" />,
+        });
+        setDeletingDebt(null);
         await fetchDebts();
+      } else {
+        toast.error("Gagal menghapus catatan transaksi", {
+          icon: <AlertCircle className="w-4 h-4 text-rose-600" />,
+        });
       }
     } catch (error) {
       console.error("Error deleting debt:", error);
+      toast.error("Terjadi kesalahan koneksi saat menghapus", {
+        icon: <AlertCircle className="w-4 h-4 text-rose-600" />,
+      });
     } finally {
+      setIsDeleting(false);
       setProcessingId(null);
     }
   };
@@ -173,7 +208,7 @@ export default function DashboardPage() {
               isLoading={isLoading}
               onSettle={handleSettle}
               onEdit={handleOpenEdit}
-              onDelete={handleDelete}
+              onDelete={onRequestDelete}
               processingId={processingId}
             />
           ) : (
@@ -182,18 +217,28 @@ export default function DashboardPage() {
               isLoading={isLoading}
               onSettle={handleSettle}
               onEdit={handleOpenEdit}
-              onDelete={handleDelete}
+              onDelete={onRequestDelete}
               processingId={processingId}
             />
           )}
         </main>
       </div>
 
+      {/* Modal Form Create/Edit */}
       <DebtModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={fetchDebts}
         initialData={editingDebt}
+      />
+
+      {/* Custom Confirmation Modal for Deleting Debt */}
+      <ConfirmDeleteModal
+        isOpen={Boolean(deletingDebt)}
+        onClose={() => setDeletingDebt(null)}
+        onConfirm={handleConfirmDelete}
+        counterpartName={deletingDebt?.counterpartName}
+        isDeleting={isDeleting}
       />
     </div>
   );
