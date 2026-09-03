@@ -3,15 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/infrastructure/supabase/client";
-import { Wallet, LogOut, User } from "lucide-react";
+import { LogOut, ChevronDown, PanelLeftClose, PanelLeftOpen, Phone } from "lucide-react";
 
 interface HeaderProps {
   userEmail: string;
+  userName?: string;
+  userPhone?: string;
+  isSidebarCollapsed: boolean;
+  onToggleSidebar: () => void;
 }
 
-export function Header({ userEmail }: HeaderProps) {
+export function Header({
+  userEmail,
+  userName,
+  userPhone,
+  isSidebarCollapsed,
+  onToggleSidebar,
+}: HeaderProps) {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -26,37 +37,85 @@ export function Header({ userEmail }: HeaderProps) {
     }
   };
 
+  const displayName = userName || userEmail || "Pengguna";
+  const initial = displayName ? displayName[0].toUpperCase() : "U";
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-            <Wallet className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-              Kasbon
-            </h1>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 hidden sm:block">
-              Track utang piutang pribadi tanpa ribet
-            </p>
-          </div>
+    <header className="sticky top-0 z-30 w-full h-16 bg-white border-b border-zinc-200/90 px-4 sm:px-6 flex items-center justify-between shadow-xs">
+      <div className="flex items-center gap-3">
+        {/* Sidebar Collapse/Expand Toggle Button */}
+        <button
+          onClick={onToggleSidebar}
+          className="p-2 rounded-xl text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition-colors cursor-pointer"
+          title={isSidebarCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
+        >
+          {isSidebarCollapsed ? (
+            <PanelLeftOpen className="w-5 h-5" />
+          ) : (
+            <PanelLeftClose className="w-5 h-5" />
+          )}
+        </button>
+
+        <div>
+          <h1 className="text-base sm:text-lg font-extrabold text-zinc-900 tracking-tight leading-none">
+            Dashboard
+          </h1>
+          <p className="text-[11px] text-zinc-500 font-medium hidden sm:block mt-0.5">
+            Kelola pencatatan utang & piutang pribadi kamu
+          </p>
         </div>
+      </div>
 
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-300">
-            <User className="w-3.5 h-3.5" />
-            <span>{userEmail}</span>
-          </div>
-
+      <div className="flex items-center gap-3">
+        {/* User Profile Trigger */}
+        <div className="relative">
           <button
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200/60 dark:border-rose-900/50 transition-colors disabled:opacity-50"
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center gap-2.5 p-1.5 sm:px-3 sm:py-1.5 rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer"
           >
-            <LogOut className="w-4 h-4" />
-            <span>{isLoggingOut ? "Keluar..." : "Logout"}</span>
+            <div className="w-8 h-8 rounded-full bg-[#D94E15] text-white flex items-center justify-center font-extrabold text-xs shadow-xs ring-2 ring-[#D94E15]/20 shrink-0">
+              {initial}
+            </div>
+            <span className="hidden sm:inline text-xs font-bold text-zinc-800 max-w-[160px] truncate">
+              {displayName}
+            </span>
+            <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
           </button>
+
+          {isOpen && (
+            <>
+              <div
+                onClick={() => setIsOpen(false)}
+                className="fixed inset-0 z-40"
+              />
+
+              <div className="absolute right-0 mt-2 w-60 p-2 rounded-2xl bg-white border border-zinc-200 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-3 py-2 border-b border-zinc-100 mb-1 space-y-0.5">
+                  <p className="text-xs font-bold text-zinc-900 truncate">
+                    {displayName}
+                  </p>
+                  <p className="text-[11px] text-zinc-400 font-medium truncate">
+                    {userEmail}
+                  </p>
+                  {userPhone && (
+                    <div className="flex items-center gap-1 text-[10px] font-semibold text-zinc-500 pt-0.5">
+                      <Phone className="w-3 h-3 text-[#D94E15]" />
+                      <span>{userPhone}</span>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>{isLoggingOut ? "Mengeluarkan..." : "Logout"}</span>
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </header>

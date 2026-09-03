@@ -23,12 +23,14 @@ export async function GET(request: NextRequest) {
     const statusParam = searchParams.get("status");
     const typeParam = searchParams.get("type");
     const searchParam = searchParams.get("search");
+    const sortParam = searchParams.get("sort");
 
     const repository = new SupabaseDebtRepository(supabase);
     const debts = await repository.findAll(user.id, {
       status: (statusParam as "all" | "unsettled" | "settled") || "all",
       type: (typeParam as "all" | "owed_to_me" | "i_owe") || "all",
       search: searchParam || undefined,
+      sort: (sortParam as "created_desc" | "created_asc" | "amount_desc" | "amount_asc") || "created_desc",
     });
 
     const summary = await repository.getSummary(user.id);

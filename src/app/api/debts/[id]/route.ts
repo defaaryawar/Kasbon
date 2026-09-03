@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/infrastructure/supabase/server";
 import { SupabaseDebtRepository } from "@/infrastructure/supabase/repositories/supabase-debt.repository";
-import { debtFormSchema, uuidParamSchema } from "@/lib/validations/debt.schema";
+import { updateDebtFormSchema, uuidParamSchema } from "@/lib/validations/debt.schema";
 import { domainEventBus } from "@/core/events/event-bus";
 
 interface RouteParams {
@@ -67,7 +67,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    const parseResult = debtFormSchema.partial().safeParse(body);
+    const parseResult = updateDebtFormSchema.safeParse(body);
     if (!parseResult.success) {
       const firstError = parseResult.error.issues[0]?.message || "Data input tidak valid";
       return NextResponse.json({ error: firstError }, { status: 400 });

@@ -1,7 +1,7 @@
 "use client";
 
-import { DebtItem, SerializedDebt } from "./DebtItem";
-import { Inbox } from "lucide-react";
+import { SerializedDebt, DebtItem } from "./DebtItem";
+import { Receipt } from "lucide-react";
 
 interface DebtListProps {
   debts: SerializedDebt[];
@@ -26,7 +26,7 @@ export function DebtList({
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-24 rounded-2xl bg-zinc-100 dark:bg-zinc-800/50 animate-pulse"
+            className="h-20 rounded-xl bg-white border border-zinc-200/80 animate-pulse"
           />
         ))}
       </div>
@@ -35,22 +35,20 @@ export function DebtList({
 
   if (debts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl bg-white dark:bg-zinc-900 border border-dashed border-zinc-200 dark:border-zinc-800">
-        <div className="p-4 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mb-3">
-          <Inbox className="w-8 h-8" />
-        </div>
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-          Belum ada catatan utang
+      <div className="flex flex-col items-center justify-center p-10 text-center rounded-xl bg-white border border-dashed border-zinc-200/90 shadow-2xs">
+        <Receipt className="w-7 h-7 text-zinc-400 mb-2" />
+        <h3 className="text-xs font-bold text-zinc-700">
+          Belum ada catatan transaksi.
         </h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mt-1">
-          Klik tombol &quot;+ Catat Baru&quot; untuk mencatat utang atau piutang pertama kamu.
+        <p className="text-[11px] text-zinc-400 mt-0.5">
+          Klik &ldquo;+ Catat Baru&rdquo; untuk menambahkan catatan utang atau piutang pertama kamu.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {debts.map((debt) => (
         <DebtItem
           key={debt.id}
