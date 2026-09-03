@@ -109,19 +109,15 @@ export function DebtModal({
         ? {
             action: "update",
             type,
-            counterpartName,
             counterpart_name: counterpartName,
             amount,
-            dueDate: dueDate ? dueDate : null,
             due_date: dueDate ? dueDate : null,
             note: note ? note : null,
           }
         : {
             type,
-            counterpartName,
             counterpart_name: counterpartName,
             amount,
-            dueDate: dueDate ? dueDate : null,
             due_date: dueDate ? dueDate : null,
             note: note ? note : null,
           };
