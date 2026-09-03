@@ -38,37 +38,37 @@ export function DebtItem({
     <div
       className={`p-4 rounded-2xl border transition-all ${
         isSettled
-          ? "bg-zinc-50/50 dark:bg-zinc-900/40 border-zinc-200/60 dark:border-zinc-800/60 opacity-80"
-          : "bg-white dark:bg-zinc-900 border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-md"
+          ? "bg-zinc-50/40 dark:bg-[#121212]/40 border-zinc-200/50 dark:border-zinc-800/50 opacity-75"
+          : "bg-white dark:bg-[#181818] border-zinc-200/80 dark:border-zinc-800/80 shadow-sm hover:border-[#FC5810]/40"
       }`}
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Person & Details */}
         <div className="flex items-start gap-3">
           <div
-            className={`p-2.5 rounded-xl shrink-0 ${
+            className={`p-2.5 rounded-xl shrink-0 border ${
               isOwedToMe
-                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                ? "bg-[#FC5810]/10 text-[#FC5810] border-[#FC5810]/20"
+                : "bg-rose-500/10 text-rose-500 border-rose-500/20"
             }`}
           >
             {isOwedToMe ? (
-              <ArrowUpRight className="w-5 h-5" />
+              <ArrowUpRight className="w-4 h-4" />
             ) : (
-              <ArrowDownLeft className="w-5 h-5" />
+              <ArrowDownLeft className="w-4 h-4" />
             )}
           </div>
 
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
                 {debt.counterpartName}
               </h3>
               <span
                 className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
                   isOwedToMe
-                    ? "bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300"
-                    : "bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300"
+                    ? "bg-[#FC5810]/10 text-[#FC5810] border border-[#FC5810]/20"
+                    : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
                 }`}
               >
                 {isOwedToMe ? "Dihutang ke saya" : "Saya hutang"}
@@ -77,8 +77,8 @@ export function DebtItem({
               <span
                 className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
                   isSettled
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                    : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
+                    ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                    : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
                 }`}
               >
                 {isSettled ? "Lunas" : "Belum lunas"}
@@ -104,14 +104,14 @@ export function DebtItem({
           </div>
         </div>
 
-        {/* Amount & Actions */}
-        <div className="flex sm:flex-col items-center sm:items-end justify-between gap-3 border-t sm:border-t-0 pt-3 sm:pt-0 border-zinc-100 dark:border-zinc-800">
+        {/* Amount & Action Buttons */}
+        <div className="flex sm:flex-col items-center sm:items-end justify-between gap-3 border-t sm:border-t-0 pt-3 sm:pt-0 border-zinc-100 dark:border-zinc-800/80">
           <div
             className={`text-lg font-extrabold ${
               isSettled
                 ? "line-through text-zinc-400 dark:text-zinc-500"
                 : isOwedToMe
-                ? "text-emerald-600 dark:text-emerald-400"
+                ? "text-[#FC5810]"
                 : "text-rose-600 dark:text-rose-400"
             }`}
           >
@@ -123,7 +123,7 @@ export function DebtItem({
               <button
                 onClick={() => onSettle(debt.id)}
                 disabled={isProcessing}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-900/50 transition-colors disabled:opacity-50"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors disabled:opacity-50 cursor-pointer"
                 title="Tandai Lunas"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
@@ -134,7 +134,7 @@ export function DebtItem({
             <button
               onClick={() => onEdit(debt)}
               disabled={isProcessing}
-              className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               title="Edit Catatan"
             >
               <Edit3 className="w-4 h-4" />
@@ -143,7 +143,7 @@ export function DebtItem({
             <button
               onClick={() => onDelete(debt.id)}
               disabled={isProcessing}
-              className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors"
+              className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition-colors cursor-pointer"
               title="Hapus Catatan"
             >
               <Trash2 className="w-4 h-4" />
