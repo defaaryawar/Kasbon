@@ -7,12 +7,14 @@ import { LogOut, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react
 
 interface HeaderProps {
   userEmail: string;
+  userName?: string;
   isSidebarCollapsed: boolean;
   onToggleSidebar: () => void;
 }
 
 export function Header({
   userEmail,
+  userName,
   isSidebarCollapsed,
   onToggleSidebar,
 }: HeaderProps) {
@@ -33,7 +35,8 @@ export function Header({
     }
   };
 
-  const initial = userEmail ? userEmail[0].toUpperCase() : "U";
+  const displayName = userName || userEmail || "Pengguna";
+  const initial = displayName ? displayName[0].toUpperCase() : "U";
 
   return (
     <header className="sticky top-0 z-30 w-full h-16 bg-white border-b border-zinc-200/90 px-4 sm:px-6 flex items-center justify-between shadow-xs">
@@ -72,7 +75,7 @@ export function Header({
               {initial}
             </div>
             <span className="hidden sm:inline text-xs font-bold text-zinc-800 max-w-[160px] truncate">
-              {userEmail}
+              {displayName}
             </span>
             <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
           </button>
@@ -86,8 +89,10 @@ export function Header({
 
               <div className="absolute right-0 mt-2 w-56 p-2 rounded-2xl bg-white border border-zinc-200 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150">
                 <div className="px-3 py-2 border-b border-zinc-100 mb-1">
-                  <p className="text-[11px] text-zinc-400 font-medium">Pengguna</p>
-                  <p className="text-xs font-bold text-zinc-900 truncate mt-0.5">
+                  <p className="text-xs font-bold text-zinc-900 truncate">
+                    {displayName}
+                  </p>
+                  <p className="text-[11px] text-zinc-400 font-medium truncate mt-0.5">
                     {userEmail}
                   </p>
                 </div>

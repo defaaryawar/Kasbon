@@ -14,6 +14,7 @@ interface AuthFormProps {
 
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -27,9 +28,16 @@ export function AuthForm({ mode }: AuthFormProps) {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const parseResult = authFormSchema.safeParse({ email, password });
+    if (!isLogin && !fullName.trim()) {
+      setErrorMessage("Nama lengkap wajib diisi");
+      return;
+    }
+
+    const parseResult = authFormSchema.safeParse({ fullName, email, password });
     if (!parseResult.success) {
-      setErrorMessage(parseResult.error.issues[0]?.message || "Input tidak valid");
+      setErrorMessage(
+        parseResult.error.issues[0]?.message || "Input tidak valid"
+      );
       return;
     }
 
@@ -41,6 +49,12 @@ export function AuthForm({ mode }: AuthFormProps) {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              full_name: fullName.trim(),
+              display_name: fullName.trim(),
+            },
+          },
         });
 
         if (error) throw error;
@@ -63,12 +77,15 @@ export function AuthForm({ mode }: AuthFormProps) {
         router.refresh();
       }
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : "Terjadi kesalahan autentikasi");
+      setErrorMessage(
+        err instanceof Error ? err.message : "Terjadi kesalahan autentikasi"
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Hero Section (Desktop Split Layout)
   const HeroSection = (
     <motion.div
       key={`hero-${mode}`}
@@ -97,8 +114,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           <span className="text-[#D94E15]">tanpa ribet.</span>
         </h2>
         <p className="text-sm text-zinc-600 max-w-sm leading-relaxed">
-          Catat siapa hutang berapa, pantau saldo net kamu secara realtime, dan kelola keuangan
-          pribadi dengan simpel dan rapi.
+          Catat siapa hutang berapa, pantau saldo net kamu secara realtime, dan kelola keuangan pribadi dengan simpel dan rapi.
         </p>
 
         <div className="pt-3 space-y-2.5">
@@ -124,7 +140,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     </motion.div>
   );
 
-  // Form Section (Cardless Soft White Layout)
+  // Form Section
   const FormSection = (
     <motion.div
       key={`form-${mode}`}
@@ -134,7 +150,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       className="flex flex-col justify-center px-4 py-8 sm:px-8 lg:px-12 w-full bg-white"
     >
       <div className="w-full max-w-sm mx-auto">
-        {/* Mobile-only Brand Header */}
+        {/* Mobile Brand Header */}
         <div className="flex lg:hidden items-center gap-2.5 mb-8">
           <div className="w-8 h-8 rounded-xl bg-[#D94E15] flex items-center justify-center font-black text-white text-base">
             K
@@ -151,14 +167,14 @@ export function AuthForm({ mode }: AuthFormProps) {
           <p className="text-xs text-zinc-500 mt-1">
             {isLogin
               ? "Masukkan email dan password kamu untuk masuk."
-              : "Daftar sekarang untuk mulai mencatat utang piutang."}
+              : "Isi nama lengkap, email, dan password untuk membuat akun."}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {errorMessage && (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-medium">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -169,8 +185,27 @@ export function AuthForm({ mode }: AuthFormProps) {
             </div>
           )}
 
+          {/* Full Name Input (Only on Sign Up) */}
+          {!isLogin && (
+            <div>
+              <label className="block text-xs font-medium text-zinc-700 mb-1.5">
+                Nama Lengkap / Username
+              </label>
+              <input
+                type="text"
+                placeholder="Contoh: Defa Aryawar"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full px-3.5 py-2.5 text-sm rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-[#D94E15] focus:ring-1 focus:ring-[#D94E15] transition-colors"
+                required={!isLogin}
+              />
+            </div>
+          )}
+
           <div>
-            <label className="block text-xs font-medium text-zinc-700 mb-1.5">Email</label>
+            <label className="block text-xs font-medium text-zinc-700 mb-1.5">
+              Email
+            </label>
             <input
               type="email"
               placeholder="nama@email.com"
@@ -182,7 +217,9 @@ export function AuthForm({ mode }: AuthFormProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-zinc-700 mb-1.5">Password</label>
+            <label className="block text-xs font-medium text-zinc-700 mb-1.5">
+              Password
+            </label>
             <input
               type="password"
               placeholder="••••••••"
@@ -213,14 +250,20 @@ export function AuthForm({ mode }: AuthFormProps) {
           {isLogin ? (
             <span>
               Belum punya akun?{" "}
-              <Link href="/signup" className="font-bold text-[#D94E15] hover:underline">
+              <Link
+                href="/signup"
+                className="font-bold text-[#D94E15] hover:underline"
+              >
                 Daftar sekarang
               </Link>
             </span>
           ) : (
             <span>
               Sudah punya akun?{" "}
-              <Link href="/login" className="font-bold text-[#D94E15] hover:underline">
+              <Link
+                href="/login"
+                className="font-bold text-[#D94E15] hover:underline"
+              >
                 Masuk di sini
               </Link>
             </span>

@@ -15,12 +15,14 @@ import {
 
 interface SidebarProps {
   userEmail: string;
+  userName?: string;
   isCollapsed: boolean;
   onOpenCreateModal: () => void;
 }
 
 export function Sidebar({
   userEmail,
+  userName,
   isCollapsed,
   onOpenCreateModal,
 }: SidebarProps) {
@@ -41,7 +43,8 @@ export function Sidebar({
     }
   };
 
-  const initial = userEmail ? userEmail[0].toUpperCase() : "U";
+  const displayName = userName || userEmail || "Pengguna";
+  const initial = displayName ? displayName[0].toUpperCase() : "U";
 
   return (
     <>
@@ -191,9 +194,9 @@ export function Sidebar({
             {!isCollapsed && (
               <div className="overflow-hidden">
                 <p className="text-xs font-bold text-zinc-900 truncate">
-                  {userEmail || "Pengguna"}
+                  {displayName}
                 </p>
-                <p className="text-[10px] text-zinc-400 font-medium">Akun Terhubung</p>
+                <p className="text-[10px] text-zinc-400 font-medium truncate">{userEmail || "Akun Terhubung"}</p>
               </div>
             )}
           </div>

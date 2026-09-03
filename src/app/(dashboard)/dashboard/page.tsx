@@ -17,6 +17,7 @@ import { CheckCircle2, Trash2, AlertCircle } from "lucide-react";
 
 export default function DashboardPage() {
   const [userEmail, setUserEmail] = useState("");
+  const [userName, setUserName] = useState("");
   const [debts, setDebts] = useState<SerializedDebt[]>([]);
   const [summary, setSummary] = useState({
     totalOwedToMe: "0",
@@ -45,7 +46,11 @@ export default function DashboardPage() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (user?.email) setUserEmail(user.email);
+      if (user) {
+        if (user.email) setUserEmail(user.email);
+        const nameFromMeta = user.user_metadata?.full_name || user.user_metadata?.display_name;
+        if (nameFromMeta) setUserName(nameFromMeta);
+      }
     };
     fetchUser();
   }, []);
@@ -162,6 +167,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#F8FAFC] font-sans text-zinc-900 flex flex-col md:flex-row">
       <Sidebar
         userEmail={userEmail}
+        userName={userName}
         isCollapsed={isSidebarCollapsed}
         onOpenCreateModal={handleOpenCreate}
       />
@@ -169,6 +175,7 @@ export default function DashboardPage() {
       <div className="flex-1 flex flex-col min-w-0">
         <Header
           userEmail={userEmail}
+          userName={userName}
           isSidebarCollapsed={isSidebarCollapsed}
           onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />

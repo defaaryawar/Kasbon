@@ -83,6 +83,11 @@ export type DebtFormValues = z.infer<typeof debtFormSchema>;
 export const uuidParamSchema = z.string().uuid("ID transaksi tidak valid");
 
 export const authFormSchema = z.object({
+  fullName: z
+    .string()
+    .trim()
+    .max(100, "Nama lengkap maksimal 100 karakter")
+    .optional(),
   email: z.string().trim().toLowerCase().email("Format email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),
 });
