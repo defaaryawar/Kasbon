@@ -50,78 +50,78 @@ Kasbon adalah web application berbasis Next.js 16 (App Router) untuk mencatat da
 
 ---
 
-## Arsitektur Aplikasi (Clean Architecture + EDA)
+## Arsitektur Aplikasi (Clean Enterprise Architecture Tier 1)
 
-Struktur direktori dan berkas aplikasi terorganisir secara lengkap sebagai berikut:
+Struktur direktori dan berkas aplikasi terorganisir secara lengkap serta ter-enkapsulasi berdasarkan Clean Architecture & Event-Driven Architecture (EDA):
 
 ```
 kasbon/
 ├── src/
-│   ├── app/
-│   │   ├── (auth)/
+│   ├── app/                                    # Next.js 16 App Router (Routing & API Endpoints)
+│   │   ├── (auth)/                             # Auth Route Group (Unprotected Authentication Pages)
 │   │   │   ├── login/
-│   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx                    # Login Page (/login)
 │   │   │   └── signup/
-│   │   │       └── page.tsx
-│   │   ├── (dashboard)/
+│   │   │       └── page.tsx                    # Signup Page (/signup)
+│   │   ├── (dashboard)/                        # Protected Application Route Group (Session Guarded)
 │   │   │   └── dashboard/
-│   │   │       └── page.tsx
-│   │   ├── api/
-│   │   │   └── debts/
-│   │   │       ├── route.ts
+│   │   │       └── page.tsx                    # Core Dashboard Page (/dashboard)
+│   │   ├── api/                                # RESTful Server API Endpoints
+│   │   │   └── debts/                          # Debt Endpoints Handler
+│   │   │       ├── route.ts                    # GET (List) & POST (Create) API Route
 │   │   │       └── [id]/
-│   │   │           └── route.ts
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   └── page.tsx
+│   │   │           └── route.ts                # PATCH (Update/Settle) & DELETE API Route
+│   │   ├── globals.css                         # Tailwind CSS v4 Directives & Global Theme Styles
+│   │   ├── layout.tsx                          # Root Application Layout & Sonner Toaster Provider
+│   │   └── page.tsx                            # Entry Route Redirect (/ -> /dashboard)
 │   │
-│   ├── application/
-│   │   └── ports/
-│   │       └── debt-repository.port.ts
+│   ├── application/                            # Application Use Cases & Contract Interfaces Layer
+│   │   └── ports/                              # Secondary Ports / Interface Definitions
+│   │       └── debt-repository.port.ts         # Contract Interface Debt Repository
 │   │
-│   ├── components/
+│   ├── components/                             # Presentation Layer (Modular Component Library)
 │   │   ├── auth/
-│   │   │   └── AuthForm.tsx
-│   │   ├── dashboard/
-│   │   │   ├── DebtBarChart.tsx
-│   │   │   ├── DebtFilter.tsx
-│   │   │   ├── DebtItem.tsx
-│   │   │   ├── DebtList.tsx
-│   │   │   ├── GroupedDebtList.tsx
-│   │   │   ├── Header.tsx
-│   │   │   ├── Sidebar.tsx
-│   │   │   └── SummaryCards.tsx
+│   │   │   └── AuthForm.tsx                    # Login/Signup Form, Password Evaluator, & Success Screen
+│   │   ├── dashboard/                          # Dashboard Feature Components
+│   │   │   ├── DebtBarChart.tsx                # Semi-Circle Gauge Arc Chart & Ratio Comparison
+│   │   │   ├── DebtFilter.tsx                  # Status/Type Filter Toolbar & Live Search Input
+│   │   │   ├── DebtItem.tsx                    # Transaction Card Item with Settle/Edit/Delete Actions
+│   │   │   ├── DebtList.tsx                    # Flat List Renderer (Skeleton & Empty States)
+│   │   │   ├── GroupedDebtList.tsx             # Grouped Accordion List Renderer by Person Name
+│   │   │   ├── Header.tsx                      # Top Navbar, Profile Avatar Popover, & Logout
+│   │   │   ├── Sidebar.tsx                     # Collapsible Navigation Sidebar with Clean Hover Tooltips
+│   │   │   └── SummaryCards.tsx                # 3 Metric Summary Cards (Piutang, Utang, Saldo Net)
 │   │   ├── form/
-│   │   │   └── DebtModal.tsx
+│   │   │   └── DebtModal.tsx                   # Transaction Form Modal (Create/Edit with Zod Validation)
 │   │   └── ui/
-│   │       └── ConfirmDeleteModal.tsx
+│   │       └── ConfirmDeleteModal.tsx          # Custom Animated Confirm Delete Dialog
 │   │
-│   ├── core/
+│   ├── core/                                   # Domain Layer (Pure Enterprise Business Logic & Events)
 │   │   ├── domain/
 │   │   │   └── models/
-│   │   │       └── debt.model.ts
-│   │   └── events/
-│   │       ├── domain-events.ts
-│   │       └── event-bus.ts
+│   │   │       └── debt.model.ts               # Pure Domain Models & Debt Entities
+│   │   └── events/                             # In-Process Event-Driven Engine (EDA)
+│   │       ├── domain-events.ts                # Domain Event Contracts (CREATED, SETTLED, UPDATED, DELETED)
+│   │       └── event-bus.ts                    # Singleton EventBus Publisher/Subscriber Engine
 │   │
-│   ├── infrastructure/
-│   │   └── supabase/
+│   ├── infrastructure/                         # Infrastructure Layer (Data Drivers & External Adapters)
+│   │   └── supabase/                           # Supabase Drivers & Data Repositories
 │   │       ├── repositories/
-│   │       │   └── supabase-debt.repository.ts
-│   │       ├── client.ts
-│   │       ├── middleware.ts
-│   │       └── server.ts
+│   │       │   └── supabase-debt.repository.ts # Implementation Debt Repository with Supabase Client
+│   │       ├── client.ts                       # Browser Supabase Client Adapter
+│   │       ├── middleware.ts                   # Auth Guard Middleware Adapter
+│   │       └── server.ts                       # Server Supabase Client Adapter (SSR / App Router)
 │   │
-│   ├── lib/
+│   ├── lib/                                    # Shared Utilities & Validations Layer
 │   │   ├── validations/
-│   │   │   └── debt.schema.ts
-│   │   └── utils.ts
+│   │   │   └── debt.schema.ts                  # Zod Input Schemas (XSS Sanitization & Strict Password Rules)
+│   │   └── utils.ts                            # Currency Formatting (id-ID) & Relative Time (date-fns)
 │   │
-│   └── middleware.ts
+│   └── middleware.ts                           # Global Next.js Auth Middleware Guard Entrypoint
 │
 └── supabase/
-    └── migrations/
-        └── 20260903000000_create_debts_table.sql
+    └── migrations/                             # Database Migrations Directory
+        └── 20260903000000_create_debts_table.sql # SQL Migration (Debts Table, Indexes, & Strict RLS)
 ```
 
 ---
@@ -154,13 +154,13 @@ Buka browser di `http://localhost:3000`.
 ## Jawaban Pertanyaan Hiring Brief (Approach, Trade-off, & Time Spent)
 
 ### 1. Technical Approach (Keputusan Teknis yang Dibanggakan)
-Saya sangat bangga menerapkan kombinasi Clean Architecture dan Event-Driven Architecture (EDA) di Next.js App Router. Penggunaan Domain EventBus terdekopel memisahkan operasi database Supabase dengan pengolahan event log, sementara validasi Zod ketat di client & server API memastikan Zero-Trust Security (mencegah XSS & manipulasi input). Ditambah visualisasi Semi-Circle Gauge Arc Chart dan transisi UI mulus yang membuat UX aplikasi terasa sangat premium.
+> "Saya sangat bangga menerapkan kombinasi Clean Architecture dan Event-Driven Architecture (EDA) di Next.js App Router. Penggunaan Domain EventBus terdekopel memisahkan operasi database Supabase dengan pengolahan event log, sementara validasi Zod ketat di client & server API memastikan Zero-Trust Security (mencegah XSS & manipulasi input). Ditambah visualisasi Semi-Circle Gauge Arc Chart dan transisi UI mulus yang membuat UX aplikasi terasa sangat premium."
 
-### 2. Trade-off (Jika Ada Waktu 1 Hari Lagi)
-Jika memiliki waktu 1 hari tambahan, saya akan mengimplementasikan fitur Ekspor Laporan Transaksi ke PDF/CSV, integrasi Pengingat Jatuh Tempo otomatis via WhatsApp API (Twilio/WATI), serta fitur Dark Mode Toggle menggunakan CSS variables.
+### 2. Trade-off (Rencana Pengembangan Fitur Lanjutan)
+> "Jika aplikasi ini dikembangkan lebih lanjut (1 hari tambahan), fitur yang dapat diimplementasikan meliputi Ekspor Laporan Transaksi ke format PDF/CSV, integrasi Pengingat Jatuh Tempo otomatis via WhatsApp API (Twilio/WATI), serta fitur Dark Mode Toggle menggunakan CSS variables."
 
 ### 3. Time Spent (Alokasi Waktu Pengerjaan)
-Total waktu pengerjaan sekitar 8 - 9 jam secara intensif, mencakup perancangan schema database + RLS, pembuatan arsitektur EventBus & Repositori, pembuatan komponen UI responsif, integrasi Supabase Auth + Brevo SMTP Custom HTML Template, hingga refactoring validasi Zod.
+> "Total waktu pengerjaan sekitar 8 - 9 jam secara intensif, mencakup perancangan schema database + RLS, pembuatan arsitektur EventBus & Repositori, pembuatan komponen UI responsif, integrasi Supabase Auth + Brevo SMTP Custom HTML Template, hingga refactoring validasi Zod."
 
 ---
 
