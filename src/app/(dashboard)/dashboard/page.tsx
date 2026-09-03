@@ -3,8 +3,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { Header } from "@/components/dashboard/Header";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
+import { DebtBarChart } from "@/components/dashboard/DebtBarChart";
 import { DebtFilter } from "@/components/dashboard/DebtFilter";
 import { DebtList } from "@/components/dashboard/DebtList";
+import { GroupedDebtList } from "@/components/dashboard/GroupedDebtList";
 import { DebtModal } from "@/components/form/DebtModal";
 import { SerializedDebt } from "@/components/dashboard/DebtItem";
 import { createClient } from "@/infrastructure/supabase/client";
@@ -22,8 +24,10 @@ export default function DashboardPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [processingId, setProcessingId] = useState<string | null>(null);
+  const [sortOption, setSortOption] = useState("created_desc");
+  const [viewMode, setViewMode] = useState<"list" | "grouped">("list");
 
+  const [processingId, setProcessingId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDebt, setEditingDebt] = useState<SerializedDebt | null>(null);
 
@@ -45,6 +49,7 @@ export default function DashboardPage() {
       if (statusFilter !== "all") params.set("status", statusFilter);
       if (typeFilter !== "all") params.set("type", typeFilter);
       if (searchQuery.trim() !== "") params.set("search", searchQuery.trim());
+      if (sortOption !== "created_desc") params.set("sort", sortOption);
 
       const res = await fetch(`/api/debts?${params.toString()}`);
       const json = await res.json();
@@ -60,7 +65,7 @@ export default function DashboardPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [statusFilter, typeFilter, searchQuery]);
+  }, [statusFilter, typeFilter, searchQuery, sortOption]);
 
   useEffect(() => {
     fetchDebts();
@@ -127,24 +132,44 @@ export default function DashboardPage() {
           net={summary.net}
         />
 
+        <DebtBarChart
+          totalOwedToMe={summary.totalOwedToMe}
+          totalIOwe={summary.totalIOwe}
+        />
+
         <DebtFilter
           statusFilter={statusFilter}
           typeFilter={typeFilter}
           searchQuery={searchQuery}
+          sortOption={sortOption}
+          viewMode={viewMode}
           onStatusChange={setStatusFilter}
           onTypeChange={setTypeFilter}
           onSearchChange={setSearchQuery}
+          onSortChange={setSortOption}
+          onViewModeChange={setViewMode}
           onOpenCreateModal={handleOpenCreate}
         />
 
-        <DebtList
-          debts={debts}
-          isLoading={isLoading}
-          onSettle={handleSettle}
-          onEdit={handleOpenEdit}
-          onDelete={handleDelete}
-          processingId={processingId}
-        />
+        {viewMode === "list" ? (
+          <DebtList
+            debts={debts}
+            isLoading={isLoading}
+            onSettle={handleSettle}
+            onEdit={handleOpenEdit}
+            onDelete={handleDelete}
+            processingId={processingId}
+          />
+        ) : (
+          <GroupedDebtList
+            debts={debts}
+            isLoading={isLoading}
+            onSettle={handleSettle}
+            onEdit={handleOpenEdit}
+            onDelete={handleDelete}
+            processingId={processingId}
+          />
+        )}
       </main>
 
       <DebtModal

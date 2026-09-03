@@ -9,8 +9,24 @@ export class SupabaseDebtRepository implements DebtRepositoryPort {
     let query = this.supabase
       .from("debts")
       .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+      .eq("user_id", userId);
+
+    const sortOption = filters?.sort || "created_desc";
+    switch (sortOption) {
+      case "created_asc":
+        query = query.order("created_at", { ascending: true });
+        break;
+      case "amount_desc":
+        query = query.order("amount", { ascending: false });
+        break;
+      case "amount_asc":
+        query = query.order("amount", { ascending: true });
+        break;
+      case "created_desc":
+      default:
+        query = query.order("created_at", { ascending: false });
+        break;
+    }
 
     if (filters?.status === "settled") {
       query = query.not("settled_at", "is", null);
